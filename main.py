@@ -59,10 +59,6 @@ def scrape_profile_data(cookies):
         token = token_el.get_attribute("value")
         print(f"Got authenticity_token: {token[:20]}...")
 
-        timestamp_el = page.query_selector('input[name="timestamp"]')
-        timestamp_val = timestamp_el.get_attribute("value") if timestamp_el else str(int(time.time() * 1000))
-        print(f"Got timestamp: {timestamp_val}")
-
         timestamp_secret_el = page.query_selector('input[name="timestamp_secret"]')
         if not timestamp_secret_el:
             raise Exception("Could not find timestamp_secret on the page")
@@ -86,7 +82,6 @@ def scrape_profile_data(cookies):
 
     return {
         "token": token,
-        "timestamp": timestamp_val,
         "timestamp_secret": timestamp_secret,
         "username": username,
     }
@@ -108,7 +103,7 @@ def update_github_profile(name, profile_data, cookies):
         "user[profile_company]": "",
         "user[profile_location]": "",
         "user[profile_local_time_zone_name]": "International Date Line West",
-        "timestamp": profile_data["timestamp"],
+        "timestamp": str(int(time.time() * 1000)),
         "timestamp_secret": profile_data["timestamp_secret"],
     }
 
