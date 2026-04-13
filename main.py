@@ -1,9 +1,6 @@
 import os
 import json
-import time
-import re
 import requests
-from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from camoufox.sync_api import Camoufox
 
@@ -69,101 +66,46 @@ def format_cookies(cookies):
     return formatted
 
 
-def build_session(cookies):
-    session = requests.Session()
-    session.headers.update({
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    })
-    for cookie in cookies:
-        session.cookies.set(
-            cookie["name"],
-            cookie["value"],
-            domain=cookie.get("domain", ".github.com"),
-            path=cookie.get("path", "/"),
-        )
-    return session
+def update_profile_via_browser(name, cookies, username):
+    profile_dir = get_profile_dir(username)
 
+    with Camoufox(headless=True, persistent_context=True, user_data_dir=profile_dir) as context:
+        context.add_cookies(format_cookies(cookies))
 
-def scrape_profile_data(session):
-    resp = session.get("https://github.com/settings/profile")
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
+        page = context.new_page()
+        page.goto("https://github.com/settings/profile")
+        page.wait_for_load_state("domcontentloaded")
 
-    token_el = soup.find("input", {"name": "authenticity_token"})
-    if not token_el:
-        raise Exception("Could not find authenticity_token on the page")
-    token = token_el["value"]
-    print(f"Got authenticity_token: {token[:20]}...")
+        name_input = page.query_selector('input[name="user[profile_name]"]')
+        if not name_input:
+            raise Exception("Could not find name input on the page")
 
-    ts_el = soup.find("input", {"name": "timestamp_secret"})
-    if not ts_el:
-        raise Exception("Could not find timestamp_secret on the page")
-    timestamp_secret = ts_el["value"]
-    print(f"Got timestamp_secret: {timestamp_secret[:20]}...")
+        name_input.fill("")
+        name_input.type(name)
+        print(f"Filled name field with: {name}")
 
-    honeypot_el = soup.find("input", {"name": re.compile(r"^required_field_")})
-    honeypot_name = honeypot_el["name"] if honeypot_el else "required_field_1b05"
-    print(f"Got honeypot field: {honeypot_name}")
+        submit_btn = page.query_selector('button[type="submit"] .Button-label')
+        if not submit_btn:
+            submit_btn = page.query_selector('button[type="submit"]')
+        if not submit_btn:
+            raise Exception("Could not find submit button on the page")
 
-    return {
-        "token": token,
-        "timestamp_secret": timestamp_secret,
-        "honeypot_name": honeypot_name,
-    }
+        page.wait_for_timeout(500)
 
+        with page.expect_navigation(wait_until="domcontentloaded", timeout=15000):
+            submit_btn.click()
 
-def update_github_profile(session, name, profile_data, username):
-    payload = [
-        ("_method", "put"),
-        ("authenticity_token", profile_data["token"]),
-        ("user[profile_name]", name),
-        ("user[profile_email]", ""),
-        ("user[profile_bio]", ""),
-        ("user[profile_pronouns]", ""),
-        ("user[profile_blog]", ""),
-        ("user[profile_social_accounts][][key]", "generic"),
-        ("user[profile_social_accounts][][url]", ""),
-        ("user[profile_social_accounts][][key]", "generic"),
-        ("user[profile_social_accounts][][url]", ""),
-        ("user[profile_social_accounts][][key]", "generic"),
-        ("user[profile_social_accounts][][url]", ""),
-        ("user[profile_social_accounts][][key]", "generic"),
-        ("user[profile_social_accounts][][url]", ""),
-        ("user[profile_company]", ""),
-        ("user[profile_location]", ""),
-        ("user[profile_local_time_zone_name]", "International Date Line West"),
-        (profile_data["honeypot_name"], ""),
-        ("timestamp", str(int(time.time() * 1000))),
-        ("timestamp_secret", profile_data["timestamp_secret"]),
-    ]
+        final_url = page.url
+        print(f"After submit, landed on: {final_url}")
 
-    headers = {
-        "cache-control": "max-age=0",
-        "content-type": "application/x-www-form-urlencoded",
-        "origin": "https://github.com",
-        "referer": "https://github.com/settings/profile",
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-user": "?1",
-        "upgrade-insecure-requests": "1",
-    }
-
-    resp = session.post(
-        f"https://github.com/users/{username}",
-        data=payload,
-        headers=headers,
-        allow_redirects=False,
-    )
-
-    print(f"Profile update status: {resp.status_code}")
-    if resp.status_code == 302:
-        print("Profile updated successfully.")
-    else:
-        print(f"Unexpected response: {resp.status_code}")
-        print(resp.text[:500])
+        if "settings/profile" in final_url:
+            flash = page.query_selector('.flash-success, .flash-notice')
+            if flash:
+                print(f"Profile updated successfully! Message: {flash.inner_text().strip()}")
+            else:
+                print("Profile updated successfully!")
+        else:
+            print(f"Unexpected result. Current URL: {final_url}")
 
 
 def main():
@@ -171,10 +113,7 @@ def main():
     cookies = load_cookies()
     username = get_username(cookies)
     print(f"Got username: {username}")
-
-    session = build_session(cookies)
-    profile_data = scrape_profile_data(session)
-    update_github_profile(session, name, profile_data, username)
+    update_profile_via_browser(name, cookies, username)
 
 
 if __name__ == "__main__":
