@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 from dotenv import load_dotenv
 from camoufox.sync_api import Camoufox
@@ -7,7 +8,6 @@ from camoufox.sync_api import Camoufox
 load_dotenv()
 
 CARD_API_URL = os.getenv("CARD_API_URL")
-GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
 
 
 def get_card_name():
@@ -24,7 +24,7 @@ def load_cookies():
         return json.load(f)
 
 
-def get_authenticity_token(cookies):
+def scrape_profile_data(cookies):
     with Camoufox(headless=True) as browser:
         context = browser.new_context()
 
@@ -56,21 +56,48 @@ def get_authenticity_token(cookies):
         token_el = page.query_selector('input[name="authenticity_token"]')
         if not token_el:
             raise Exception("Could not find authenticity_token on the page")
-
         token = token_el.get_attribute("value")
         print(f"Got authenticity_token: {token[:20]}...")
 
+        timestamp_el = page.query_selector('input[name="timestamp"]')
+        timestamp_val = timestamp_el.get_attribute("value") if timestamp_el else str(int(time.time() * 1000))
+        print(f"Got timestamp: {timestamp_val}")
+
+        timestamp_secret_el = page.query_selector('input[name="timestamp_secret"]')
+        if not timestamp_secret_el:
+            raise Exception("Could not find timestamp_secret on the page")
+        timestamp_secret = timestamp_secret_el.get_attribute("value")
+        print(f"Got timestamp_secret: {timestamp_secret[:20]}...")
+
+        username = None
+        form_el = page.query_selector('form[action*="/users/"]')
+        if form_el:
+            action = form_el.get_attribute("action")
+            username = action.split("/users/")[-1].split("/")[0].split("?")[0]
+        if not username:
+            meta_el = page.query_selector('meta[name="user-login"]')
+            if meta_el:
+                username = meta_el.get_attribute("content")
+        if not username:
+            raise Exception("Could not determine GitHub username from page")
+        print(f"Got username: {username}")
+
         context.close()
 
-    return token
+    return {
+        "token": token,
+        "timestamp": timestamp_val,
+        "timestamp_secret": timestamp_secret,
+        "username": username,
+    }
 
 
-def update_github_profile(name, token, cookies):
+def update_github_profile(name, profile_data, cookies):
     cookie_str = "; ".join(f"{c['name']}={c['value']}" for c in cookies)
 
     payload = {
         "_method": "put",
-        "authenticity_token": token,
+        "authenticity_token": profile_data["token"],
         "user[profile_name]": name,
         "user[profile_email]": "",
         "user[profile_bio]": "",
@@ -81,6 +108,8 @@ def update_github_profile(name, token, cookies):
         "user[profile_company]": "",
         "user[profile_location]": "",
         "user[profile_local_time_zone_name]": "International Date Line West",
+        "timestamp": profile_data["timestamp"],
+        "timestamp_secret": profile_data["timestamp_secret"],
     }
 
     headers = {
@@ -100,7 +129,7 @@ def update_github_profile(name, token, cookies):
     }
 
     resp = requests.post(
-        f"https://github.com/users/{GITHUB_USERNAME}",
+        f"https://github.com/users/{profile_data['username']}",
         data=payload,
         headers=headers,
         allow_redirects=False,
@@ -117,8 +146,8 @@ def update_github_profile(name, token, cookies):
 def main():
     name = get_card_name()
     cookies = load_cookies()
-    token = get_authenticity_token(cookies)
-    update_github_profile(name, token, cookies)
+    profile_data = scrape_profile_data(cookies)
+    update_github_profile(name, profile_data, cookies)
 
 
 if __name__ == "__main__":
