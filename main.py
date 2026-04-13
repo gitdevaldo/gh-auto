@@ -1,7 +1,9 @@
 import os
 import json
 import time
+import re
 import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from camoufox.sync_api import Camoufox
 
@@ -67,47 +69,52 @@ def format_cookies(cookies):
     return formatted
 
 
-def scrape_profile_data(cookies, username):
-    profile_dir = get_profile_dir(username)
+def build_session(cookies):
+    session = requests.Session()
+    session.headers.update({
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+    })
+    for cookie in cookies:
+        session.cookies.set(
+            cookie["name"],
+            cookie["value"],
+            domain=cookie.get("domain", ".github.com"),
+            path=cookie.get("path", "/"),
+        )
+    return session
 
-    with Camoufox(headless=True, persistent_context=True, user_data_dir=profile_dir) as context:
-        context.add_cookies(format_cookies(cookies))
 
-        page = context.new_page()
-        page.goto("https://github.com/settings/profile")
-        page.wait_for_load_state("domcontentloaded")
+def scrape_profile_data(session):
+    resp = session.get("https://github.com/settings/profile")
+    resp.raise_for_status()
+    soup = BeautifulSoup(resp.text, "html.parser")
 
-        token_el = page.query_selector('input[name="authenticity_token"]')
-        if not token_el:
-            raise Exception("Could not find authenticity_token on the page")
-        token = token_el.get_attribute("value")
-        print(f"Got authenticity_token: {token[:20]}...")
+    token_el = soup.find("input", {"name": "authenticity_token"})
+    if not token_el:
+        raise Exception("Could not find authenticity_token on the page")
+    token = token_el["value"]
+    print(f"Got authenticity_token: {token[:20]}...")
 
-        timestamp_secret_el = page.query_selector('input[name="timestamp_secret"]')
-        if not timestamp_secret_el:
-            raise Exception("Could not find timestamp_secret on the page")
-        timestamp_secret = timestamp_secret_el.get_attribute("value")
-        print(f"Got timestamp_secret: {timestamp_secret[:20]}...")
+    ts_el = soup.find("input", {"name": "timestamp_secret"})
+    if not ts_el:
+        raise Exception("Could not find timestamp_secret on the page")
+    timestamp_secret = ts_el["value"]
+    print(f"Got timestamp_secret: {timestamp_secret[:20]}...")
 
-        honeypot_el = page.query_selector('input[name^="required_field_"]')
-        honeypot_name = honeypot_el.get_attribute("name") if honeypot_el else "required_field_1b05"
-        print(f"Got honeypot field: {honeypot_name}")
-
-        session_cookies = context.cookies("https://github.com")
-        print(f"Got {len(session_cookies)} session cookies")
+    honeypot_el = soup.find("input", {"name": re.compile(r"^required_field_")})
+    honeypot_name = honeypot_el["name"] if honeypot_el else "required_field_1b05"
+    print(f"Got honeypot field: {honeypot_name}")
 
     return {
         "token": token,
         "timestamp_secret": timestamp_secret,
         "honeypot_name": honeypot_name,
-        "username": username,
-        "session_cookies": session_cookies,
     }
 
 
-def update_github_profile(name, profile_data):
-    cookie_str = "; ".join(f"{c['name']}={c['value']}" for c in profile_data["session_cookies"])
-
+def update_github_profile(session, name, profile_data, username):
     payload = [
         ("_method", "put"),
         ("authenticity_token", profile_data["token"]),
@@ -133,8 +140,6 @@ def update_github_profile(name, profile_data):
     ]
 
     headers = {
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
         "cache-control": "max-age=0",
         "content-type": "application/x-www-form-urlencoded",
         "origin": "https://github.com",
@@ -144,12 +149,10 @@ def update_github_profile(name, profile_data):
         "sec-fetch-site": "same-origin",
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": "1",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-        "cookie": cookie_str,
     }
 
-    resp = requests.post(
-        f"https://github.com/users/{profile_data['username']}",
+    resp = session.post(
+        f"https://github.com/users/{username}",
         data=payload,
         headers=headers,
         allow_redirects=False,
@@ -168,8 +171,10 @@ def main():
     cookies = load_cookies()
     username = get_username(cookies)
     print(f"Got username: {username}")
-    profile_data = scrape_profile_data(cookies, username)
-    update_github_profile(name, profile_data)
+
+    session = build_session(cookies)
+    profile_data = scrape_profile_data(session)
+    update_github_profile(session, name, profile_data, username)
 
 
 if __name__ == "__main__":
