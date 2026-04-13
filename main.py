@@ -90,22 +90,29 @@ def scrape_profile_data(cookies):
 def update_github_profile(name, profile_data, cookies):
     cookie_str = "; ".join(f"{c['name']}={c['value']}" for c in cookies)
 
-    payload = {
-        "_method": "put",
-        "authenticity_token": profile_data["token"],
-        "user[profile_name]": name,
-        "user[profile_email]": "",
-        "user[profile_bio]": "",
-        "user[profile_pronouns]": "",
-        "user[profile_blog]": "",
-        "user[profile_social_accounts][][key]": "generic",
-        "user[profile_social_accounts][][url]": "",
-        "user[profile_company]": "",
-        "user[profile_location]": "",
-        "user[profile_local_time_zone_name]": "International Date Line West",
-        "timestamp": str(int(time.time() * 1000)),
-        "timestamp_secret": profile_data["timestamp_secret"],
-    }
+    payload = [
+        ("_method", "put"),
+        ("authenticity_token", profile_data["token"]),
+        ("user[profile_name]", name),
+        ("user[profile_email]", ""),
+        ("user[profile_bio]", ""),
+        ("user[profile_pronouns]", ""),
+        ("user[profile_blog]", ""),
+        ("user[profile_social_accounts][][key]", "generic"),
+        ("user[profile_social_accounts][][url]", ""),
+        ("user[profile_social_accounts][][key]", "generic"),
+        ("user[profile_social_accounts][][url]", ""),
+        ("user[profile_social_accounts][][key]", "generic"),
+        ("user[profile_social_accounts][][url]", ""),
+        ("user[profile_social_accounts][][key]", "generic"),
+        ("user[profile_social_accounts][][url]", ""),
+        ("user[profile_company]", ""),
+        ("user[profile_location]", ""),
+        ("user[profile_local_time_zone_name]", "International Date Line West"),
+        ("required_field_1b05", ""),
+        ("timestamp", str(int(time.time() * 1000))),
+        ("timestamp_secret", profile_data["timestamp_secret"]),
+    ]
 
     headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
