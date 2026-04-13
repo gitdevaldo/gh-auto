@@ -1,4 +1,6 @@
 import argparse
+import os
+import shutil
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -6,7 +8,7 @@ load_dotenv()
 from lib.card import get_card_data
 from lib.cookies import load_cookies, get_username
 from lib.address import get_random_address, split_name
-from lib.browser import open_browser, open_browser_fresh
+from lib.browser import open_browser, open_browser_fresh, get_profile_dir
 from lib.github import update_profile_name, update_billing_address, apply_education, ensure_2fa, login_github
 
 
@@ -18,6 +20,13 @@ def header(title):
     print(f"\n{'='*50}")
     print(f"  {title}")
     print(f"{'='*50}")
+
+
+def cleanup_profile(profile_name):
+    profile_dir = get_profile_dir(profile_name)
+    if os.path.exists(profile_dir):
+        shutil.rmtree(profile_dir)
+        log(f"Profile cleaned up: {profile_name}")
 
 
 def main():
@@ -45,9 +54,10 @@ def main():
         else:
             raise Exception("Password is required after --login email/username")
 
-        profile_name = email.split("@")[0] if "@" in email else email
+        profile_name = email
 
         header("Opening Browser")
+        log(f"Profile: {profile_name}")
         context, ctx = open_browser_fresh(profile_name)
         try:
             page = ctx.new_page()
@@ -68,9 +78,12 @@ def main():
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
+
+        cleanup_profile(profile_name)
     else:
         cookies = load_cookies()
         username = get_username(cookies)
+        profile_name = username
 
         header("Opening Browser")
         log(f"User: {username}")
@@ -91,6 +104,8 @@ def main():
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
+
+        cleanup_profile(profile_name)
 
     header("Complete")
     log("All tasks finished successfully!")
