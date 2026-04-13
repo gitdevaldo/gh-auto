@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.nss
     pkgs.alsa-lib
     pkgs.xorg.libXrender
     pkgs.xorg.libXt
