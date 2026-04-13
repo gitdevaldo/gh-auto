@@ -28,6 +28,11 @@ def login_github(page, email, password):
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
 
+    current_url = page.url
+    if "github.com/login" not in current_url:
+        _log("Already logged in — login skipped")
+        return _get_username_from_page(page)
+
     login_field = page.locator('input#login_field')
     login_field.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(500)
@@ -53,6 +58,12 @@ def login_github(page, email, password):
             raise Exception(f"Login failed: {error_text}")
         raise Exception("Login failed: still on login page")
 
+    username = _get_username_from_page(page)
+    _log(f"Logged in as: {username}")
+    return username
+
+
+def _get_username_from_page(page):
     username = None
     cookies = page.context.cookies()
     for cookie in cookies:
@@ -66,9 +77,8 @@ def login_github(page, email, password):
             username = meta.get_attribute("content")
 
     if not username:
-        raise Exception("Login succeeded but could not determine username")
+        raise Exception("Could not determine username")
 
-    _log(f"Logged in as: {username}")
     return username
 
 
