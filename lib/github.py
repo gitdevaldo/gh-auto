@@ -59,11 +59,8 @@ def login_github(page, email, password):
     password_field.fill(password)
     page.wait_for_timeout(DELAY)
 
-    sign_in_btn = page.locator('input[name="commit"][value="Sign in"]')
-    sign_in_btn.click()
-
-    page.wait_for_load_state("domcontentloaded")
-    page.wait_for_timeout(3000)
+    page.evaluate('document.querySelector(\'input[name="commit"][value="Sign in"]\').click()')
+    page.wait_for_timeout(5000)
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
