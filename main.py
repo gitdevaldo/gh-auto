@@ -1,4 +1,6 @@
 import argparse
+import os
+import shutil
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,8 +12,23 @@ from lib.browser import open_browser, open_browser_fresh
 from lib.github import update_profile_name, update_billing_address, apply_education, ensure_2fa, login_github
 
 
+PROFILES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles")
+
+
 def log(msg):
     print(f"  {msg}")
+
+
+def _rename_profile(old_name, new_name):
+    old_path = os.path.join(PROFILES_DIR, old_name)
+    new_path = os.path.join(PROFILES_DIR, new_name)
+    if old_path == new_path:
+        return
+    if os.path.exists(new_path):
+        shutil.rmtree(new_path)
+    if os.path.exists(old_path):
+        shutil.move(old_path, new_path)
+        log(f"Profile saved as: {new_name}")
 
 
 def header(title):
@@ -45,15 +62,25 @@ def main():
         else:
             raise Exception("Password is required after --login email/username")
 
-        profile_name = email.split("@")[0] if "@" in email else email
+        temp_profile = "_tmp_login"
 
         header("Opening Browser")
-        context, ctx = open_browser_fresh(profile_name)
+        context, ctx = open_browser_fresh(temp_profile)
         try:
             page = ctx.new_page()
 
             header("Logging In")
             username = login_github(page, email, password)
+        finally:
+            context.__exit__(None, None, None)
+
+        _rename_profile(temp_profile, username)
+
+        header("Opening Browser")
+        log(f"User: {username}")
+        context, ctx = open_browser_fresh(username)
+        try:
+            page = ctx.new_page()
 
             header("Two-Factor Authentication")
             ensure_2fa(page, username)
