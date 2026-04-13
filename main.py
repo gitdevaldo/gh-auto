@@ -58,7 +58,8 @@ def main():
         profile_name = email
 
         header("Login")
-        context, ctx = open_browser(profile_name)
+        institution = card_data.get("institution", "")
+        context, ctx = open_browser(profile_name, institution=institution)
         try:
             page = ctx.new_page()
 
@@ -87,7 +88,8 @@ def main():
         log(f"User: {username}")
 
         header("Setup")
-        context, ctx = open_browser(username, cookies=cookies)
+        institution = card_data.get("institution", "")
+        context, ctx = open_browser(username, cookies=cookies, institution=institution)
         try:
             page = ctx.new_page()
 
