@@ -70,14 +70,20 @@ def scrape_profile_data(cookies):
         print(f"Got honeypot field: {honeypot_name}")
 
         username = None
-        form_el = page.query_selector('form[action*="/users/"]')
-        if form_el:
-            action = form_el.get_attribute("action")
-            username = action.split("/users/")[-1].split("/")[0].split("?")[0]
+        meta_el = page.query_selector('meta[name="user-login"]')
+        if meta_el:
+            username = meta_el.get_attribute("content")
         if not username:
-            meta_el = page.query_selector('meta[name="user-login"]')
-            if meta_el:
-                username = meta_el.get_attribute("content")
+            form_el = page.query_selector('form.edit_user')
+            if form_el:
+                action = form_el.get_attribute("action")
+                if action and "/users/" in action:
+                    username = action.split("/users/")[-1].split("/")[0].split("?")[0]
+        if not username:
+            link_el = page.query_selector('a[href*="github.com/"][data-hydro-click]')
+            if link_el:
+                href = link_el.get_attribute("href")
+                username = href.rstrip("/").split("/")[-1]
         if not username:
             raise Exception("Could not determine GitHub username from page")
         print(f"Got username: {username}")
