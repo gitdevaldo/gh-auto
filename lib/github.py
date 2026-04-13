@@ -119,23 +119,23 @@ def _handle_login_2fa(page, login_identifier):
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(3000)
+
+    current_url = page.url
+    if "sessions/two-factor" not in current_url:
+        page.wait_for_load_state("domcontentloaded")
+        return
 
     verify_btn = page.locator('button[type="submit"]:has-text("Verify")')
-    verify_btn.click()
-
-    page.wait_for_timeout(5000)
-    page.wait_for_load_state("domcontentloaded")
-    page.wait_for_timeout(3000)
+    if verify_btn.count() > 0 and verify_btn.first.is_visible():
+        verify_btn.first.click(timeout=5000)
+        page.wait_for_timeout(5000)
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
         _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.")
 
-    if "github.com" not in current_url or "login" in current_url or "sessions" in current_url:
-        page.goto("https://github.com")
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(2000)
+    page.wait_for_load_state("domcontentloaded")
 
 
 def _get_username_from_page(page):
