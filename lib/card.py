@@ -32,13 +32,12 @@ MOCK_CARD_DATA = {
 
 def get_card_data():
     if MOCKUP:
-        print("[MOCKUP] Using mock card data")
         data = MOCK_CARD_DATA
     else:
         resp = requests.get(CARD_API_URL)
         resp.raise_for_status()
         data = resp.json()
-    print(f"Got card data: name={data.get('name')}, school={data.get('schoolName')}")
+    print(f"  Card: {data.get('name')} — {data.get('schoolName')}")
     return data
 
 

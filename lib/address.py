@@ -8,9 +8,7 @@ def get_random_address():
     resp.raise_for_status()
     data = resp.json()
     if isinstance(data, list) and len(data) > 0:
-        address = data[0]
-        print(f"Got address: {address.get('address_line')}, {address.get('city')}, {address.get('state_province')} {address.get('postal_code')}")
-        return address
+        return data[0]
     raise Exception("No address data returned from API")
 
 

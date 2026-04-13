@@ -10,6 +10,16 @@ from lib.browser import open_browser, open_browser_fresh
 from lib.github import update_profile_name, update_billing_address, apply_education, ensure_2fa, login_github
 
 
+def log(msg):
+    print(f"  {msg}")
+
+
+def header(title):
+    print(f"\n{'='*50}")
+    print(f"  {title}")
+    print(f"{'='*50}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--type", choices=["faculty", "student"], default="faculty",
@@ -18,13 +28,15 @@ def main():
                         help="Login with email/username and password: email/username password")
     args, remaining = parser.parse_known_args()
 
+    header("Preparing Data")
+
     card_data = get_card_data()
     name = card_data["name"]
-
     first_name, last_name = split_name(name)
-    print(f"Split name: first='{first_name}', last='{last_name}'")
+    log(f"Name: {first_name} {last_name}")
 
     address = get_random_address()
+    log(f"Address: {address.get('address_line')}, {address.get('city')}")
 
     if args.login:
         email = args.login
@@ -34,41 +46,55 @@ def main():
             raise Exception("Password is required after --login email/username")
 
         profile_name = email.split("@")[0] if "@" in email else email
+
+        header("Opening Browser")
         context, ctx = open_browser_fresh(profile_name)
         try:
             page = ctx.new_page()
 
+            header("Logging In")
             username = login_github(page, email, password)
 
+            header("Two-Factor Authentication")
             ensure_2fa(page, username)
 
+            header("Updating Profile")
             update_profile_name(page, name)
 
+            header("Updating Billing Address")
             update_billing_address(page, first_name, last_name, address)
 
+            header("Applying for Education Benefits")
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
     else:
         cookies = load_cookies()
         username = get_username(cookies)
-        print(f"Got username: {username}")
 
+        header("Opening Browser")
+        log(f"User: {username}")
         context, ctx = open_browser(username, cookies)
         try:
             page = ctx.new_page()
 
+            header("Two-Factor Authentication")
             ensure_2fa(page, username)
 
+            header("Updating Profile")
             update_profile_name(page, name)
 
+            header("Updating Billing Address")
             update_billing_address(page, first_name, last_name, address)
 
+            header("Applying for Education Benefits")
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
 
-    print("All done!")
+    header("Complete")
+    log("All tasks finished successfully!")
+    print()
 
 
 if __name__ == "__main__":

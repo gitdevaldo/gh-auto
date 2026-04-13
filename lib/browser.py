@@ -12,9 +12,6 @@ def get_profile_dir(username):
     profile_path = os.path.join(PROFILES_DIR, username)
     if not os.path.exists(profile_path):
         os.makedirs(profile_path, exist_ok=True)
-        print(f"Created new browser profile: {profile_path}")
-    else:
-        print(f"Using existing browser profile: {profile_path}")
     return profile_path
 
 
@@ -32,9 +29,7 @@ def open_browser(username, cookies, geolocation=None):
     )
     ctx = context.__enter__()
     ctx.clear_cookies()
-    print("Cleared old cookies from persistent profile")
     ctx.add_cookies(format_cookies(cookies))
-    print("Loaded fresh cookies into browser context")
     return context, ctx
 
 
@@ -52,5 +47,4 @@ def open_browser_fresh(profile_name, geolocation=None):
     )
     ctx = context.__enter__()
     ctx.clear_cookies()
-    print("Cleared old cookies from persistent profile")
     return context, ctx

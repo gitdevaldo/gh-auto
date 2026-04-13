@@ -19,28 +19,28 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OTP_DIR = os.path.join(BASE_DIR, "otp")
 
 
+def _log(msg):
+    print(f"  {msg}")
+
+
 def login_github(page, email, password):
     page.goto(LOGIN_URL)
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
-    print("Navigated to GitHub login page")
 
     login_field = page.locator('input#login_field')
     login_field.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(500)
     login_field.fill(email)
-    print(f"Entered email/username: {email}")
 
     password_field = page.locator('input#password')
     page.wait_for_timeout(500)
     password_field.fill(password)
-    print("Entered password")
 
     page.wait_for_timeout(1000)
 
     sign_in_btn = page.locator('input[name="commit"][value="Sign in"]')
     sign_in_btn.click()
-    print("Clicked 'Sign in'")
 
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(3000)
@@ -52,8 +52,6 @@ def login_github(page, email, password):
             error_text = error_el.first.inner_text().strip()
             raise Exception(f"Login failed: {error_text}")
         raise Exception("Login failed: still on login page")
-
-    print(f"Login successful — redirected to {current_url}")
 
     username = None
     cookies = page.context.cookies()
@@ -70,7 +68,7 @@ def login_github(page, email, password):
     if not username:
         raise Exception("Login succeeded but could not determine username")
 
-    print(f"Logged in as: {username}")
+    _log(f"Logged in as: {username}")
     return username
 
 
@@ -78,14 +76,13 @@ def ensure_2fa(page, username):
     page.goto(SECURITY_URL)
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
-    print("Navigated to security settings")
 
     not_enabled = page.query_selector('h2.blankslate-heading')
     if not_enabled and "not enabled yet" in not_enabled.inner_text().strip().lower():
-        print("2FA is NOT enabled — starting setup")
+        _log("2FA not enabled — setting up...")
         return _setup_2fa(page, username)
     else:
-        print("2FA is already enabled")
+        _log("2FA already enabled — skipping")
         return None
 
 
@@ -97,7 +94,6 @@ def _setup_2fa(page, username):
     enable_btn.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     enable_btn.click()
-    print("Clicked 'Enable two-factor authentication'")
 
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
@@ -106,43 +102,38 @@ def _setup_2fa(page, username):
     setup_key_btn.wait_for(state="visible", timeout=15000)
     page.wait_for_timeout(1000)
     setup_key_btn.click()
-    print("Clicked 'setup key'")
 
     page.wait_for_timeout(2000)
 
     secret_el = page.locator('[data-target="two-factor-setup-verification.mashedSecret"]')
     secret_el.wait_for(state="visible", timeout=10000)
     secret = secret_el.inner_text().strip()
-    print(f"Got TOTP secret: {secret}")
 
     secret_path = os.path.join(user_otp_dir, "secret.txt")
     with open(secret_path, "w") as f:
         f.write(secret)
-    print(f"Saved TOTP secret to {secret_path}")
+    _log(f"TOTP secret saved to {secret_path}")
 
     page.wait_for_timeout(1000)
 
     page.keyboard.press("Escape")
-    print("Pressed Escape to close popup")
 
     page.wait_for_timeout(1500)
 
     totp = pyotp.TOTP(secret)
     otp_code = totp.now()
-    print(f"Generated OTP code: {otp_code}")
 
     otp_input = page.locator('input[data-target="two-factor-setup-verification.appOtpInput"]')
     otp_input.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
-    print(f"Entered OTP code: {otp_code}")
+    _log("OTP code entered — waiting for verification...")
 
     page.wait_for_timeout(3000)
 
     download_btn = page.locator('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
     download_btn.wait_for(state="visible", timeout=30000)
-    print("Recovery codes step appeared — download button visible")
 
     page.wait_for_timeout(2000)
 
@@ -152,18 +143,16 @@ def _setup_2fa(page, username):
     try:
         with page.expect_download(timeout=10000) as download_info:
             download_btn.click()
-            print("Clicked 'Download' recovery codes")
         download = download_info.value
         page.wait_for_timeout(2000)
         recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
         download.save_as(recovery_path)
-        print(f"Saved recovery codes (downloaded file) to {recovery_path}")
-    except Exception as e:
-        print(f"Download method failed ({e}), using scraped recovery codes")
+    except Exception:
         recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
         with open(recovery_path, "w") as f:
             f.write(recovery_codes_text)
-        print(f"Saved recovery codes (scraped) to {recovery_path}")
+
+    _log(f"Recovery codes saved to {recovery_path}")
 
     page.wait_for_timeout(1500)
 
@@ -171,17 +160,10 @@ def _setup_2fa(page, username):
     continue_btn.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     continue_btn.click()
-    print("Clicked 'I have saved my recovery codes'")
 
     page.wait_for_timeout(5000)
 
-    done_heading = page.locator('h1:has-text("2FA")')
-    if done_heading.count() > 0:
-        print("SUCCESS: Two-factor authentication is now enabled!")
-    else:
-        print("2FA setup completed")
-
-    print(f"All 2FA files saved to {user_otp_dir}")
+    _log("2FA enabled successfully")
     return secret
 
 
@@ -193,17 +175,14 @@ def _scrape_recovery_codes(page):
         if text:
             codes.append(text)
     if codes:
-        print(f"Scraped {len(codes)} recovery codes from page")
         return "\n".join(codes)
 
     container = page.locator('.recovery-codes, [data-target*="recovery"], pre, code')
     for i in range(container.count()):
         text = container.nth(i).inner_text().strip()
         if text and len(text) > 20:
-            print("Scraped recovery codes from container")
             return text
 
-    print("WARNING: Could not scrape recovery codes from page")
     return ""
 
 
@@ -217,7 +196,6 @@ def update_profile_name(page, name):
 
     name_input.fill("")
     name_input.type(name)
-    print(f"Filled name field with: {name}")
 
     submit_btn = page.query_selector('button[type="submit"] .Button-label')
     if not submit_btn:
@@ -230,17 +208,7 @@ def update_profile_name(page, name):
     with page.expect_navigation(wait_until="domcontentloaded", timeout=15000):
         submit_btn.click()
 
-    final_url = page.url
-    print(f"After submit, landed on: {final_url}")
-
-    if "settings/profile" in final_url:
-        flash = page.query_selector('.flash-success, .flash-notice')
-        if flash:
-            print(f"Profile updated successfully! Message: {flash.inner_text().strip()}")
-        else:
-            print("Profile updated successfully!")
-    else:
-        print(f"Unexpected result. Current URL: {final_url}")
+    _log(f"Profile name set to: {name}")
 
 
 def update_billing_address(page, first_name, last_name, address):
@@ -254,19 +222,14 @@ def update_billing_address(page, first_name, last_name, address):
         raise Exception("Could not find Edit billing button on the page")
 
     edit_btn.click()
-    print("Clicked Edit billing button, waiting for form...")
 
     page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=10000)
-    print("Billing form appeared")
 
     def fill_input(selector, value):
         el = page.query_selector(selector)
         if el:
             el.fill("")
             el.type(value)
-            print(f"  Filled {selector} with: {value}")
-        else:
-            print(f"  WARNING: Could not find {selector}")
 
     fill_input('#billing_contact_first_name', first_name)
     fill_input('#billing_contact_last_name', last_name)
@@ -276,10 +239,7 @@ def update_billing_address(page, first_name, last_name, address):
     country_select = page.query_selector('#billing_contact_country_code')
     if country_select:
         page.select_option('#billing_contact_country_code', 'ID')
-        print("  Selected country: Indonesia (ID)")
         page.wait_for_timeout(500)
-    else:
-        print("  WARNING: Could not find country select")
 
     fill_input('#region_region', address['state_province'])
     fill_input('#billing_contact_postal_code', address['postal_code'])
@@ -293,15 +253,10 @@ def update_billing_address(page, first_name, last_name, address):
         raise Exception("Could not find Save billing button")
 
     save_btn.click()
-    print("Clicked Save billing information")
 
     page.wait_for_timeout(2000)
 
-    flash = page.query_selector('.flash-success, .flash-notice')
-    if flash:
-        print(f"Billing updated successfully! Message: {flash.inner_text().strip()}")
-    else:
-        print("Billing information saved.")
+    _log(f"Billing address updated — {address['city']}, {address['state_province']}")
 
 
 def _build_photo_proof(image_b64):
@@ -334,7 +289,6 @@ def _make_intercept_handler(photo_proof_json):
         key = "dev_pack_form[photo_proof]"
         if key in params:
             params[key] = [photo_proof_json]
-            print("Intercepted POST: replaced photo_proof with camera-faked blob")
 
         new_body = urlencode(params, doseq=True)
         route.continue_(post_data=new_body)
@@ -354,17 +308,14 @@ def apply_education(page, card_data, app_type="faculty"):
     photo_proof_json = _build_photo_proof(image_b64)
 
     page.route("**/settings/education/developer_pack_applications", _make_intercept_handler(photo_proof_json))
-    print("Route interceptor installed for developer_pack_applications")
 
     page.goto(EDUCATION_URL)
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
-    print("Navigated to education benefits page")
 
     start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=15000)
     page.wait_for_timeout(1000)
     start_btn.click()
-    print("Clicked 'Start an application'")
 
     page.wait_for_timeout(2000)
 
@@ -376,7 +327,7 @@ def apply_education(page, card_data, app_type="faculty"):
     radio = page.wait_for_selector(radio_id, state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     radio.click()
-    print(f"Selected application type: {app_type}")
+    _log(f"Application type: {app_type}")
 
     page.wait_for_timeout(1500)
 
@@ -384,7 +335,6 @@ def apply_education(page, card_data, app_type="faculty"):
     page.wait_for_timeout(500)
     school_input.fill("")
     school_input.type(school_name, delay=100)
-    print(f"Typed school name: {school_name}")
 
     page.wait_for_timeout(2000)
 
@@ -398,30 +348,25 @@ def apply_education(page, card_data, app_type="faculty"):
     all_options = page.query_selector_all(
         '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection'
     )
-    print(f"  Found {len(all_options)} school option(s) in dropdown")
 
     best_match = None
     school_name_lower = school_name.strip().lower()
     for opt in all_options:
         opt_name = opt.get_attribute('data-school-name') or opt.inner_text().strip()
-        print(f"    Option: '{opt_name}'")
         if opt_name.strip().lower() == school_name_lower:
             best_match = opt
             break
 
     if not best_match:
         best_match = all_options[0]
-        fallback_name = best_match.get_attribute('data-school-name') or best_match.inner_text().strip()
-        print(f"  No exact match found, using first option: '{fallback_name}'")
 
     selected_name = best_match.get_attribute('data-school-name') or best_match.inner_text().strip()
     best_match.click()
-    print(f"Selected school from dropdown: '{selected_name}'")
+    _log(f"School selected: {selected_name}")
 
     page.wait_for_timeout(2000)
 
     input_val = school_input.input_value()
-    print(f"  School input value after selection: '{input_val}'")
     if not input_val.strip():
         raise Exception("School selection failed — input is empty after clicking option")
 
@@ -429,23 +374,19 @@ def apply_education(page, card_data, app_type="faculty"):
     if share_btn and share_btn.is_visible():
         page.wait_for_timeout(1000)
         share_btn.click()
-        print("Clicked 'Share Location' — geolocation already granted via context")
+        _log("Location shared")
         page.wait_for_timeout(3000)
-    else:
-        print("  'Share Location' button not found or not visible, skipping")
 
     page.wait_for_timeout(1000)
 
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
-    btn_text = continue_btn.inner_text().strip()
-    print(f"  Continue button text: '{btn_text}'")
 
     if continue_btn.is_disabled():
         raise Exception("Continue button is disabled. Step 1 requirements not met.")
 
     page.wait_for_timeout(1000)
     continue_btn.click()
-    print("Clicked 'Continue'")
+    _log("Step 1 completed — continuing...")
 
     page.wait_for_timeout(5000)
 
@@ -453,36 +394,32 @@ def apply_education(page, card_data, app_type="faculty"):
         proof_btn = page.wait_for_selector('button:has-text("Select...")', state="visible", timeout=10000)
         page.wait_for_timeout(1000)
         proof_btn.click()
-        print("Opened proof type selector")
 
         page.wait_for_timeout(1000)
         id_card_option = page.wait_for_selector('[role="option"]:has-text("ID")', state="visible", timeout=10000)
         id_card_option.click()
-        print("Selected proof type: ID Card")
+        _log("Proof type: ID Card")
 
         page.wait_for_timeout(1500)
 
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
-    submit_text = submit_btn.inner_text().strip()
-    print(f"  Submit button text: '{submit_text}'")
 
     if submit_btn.is_disabled():
         raise Exception("Submit button is disabled. Step 2 requirements not met.")
 
     page.wait_for_timeout(1000)
     submit_btn.click()
-    print("Clicked 'Submit Application'")
+    _log("Step 2 completed — submitting...")
 
     page.wait_for_timeout(5000)
 
     location_mismatch = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
     if location_mismatch and location_mismatch.is_visible():
-        print("Step 3 detected: location mismatch — need to provide reason")
+        _log("Location mismatch detected — handling step 3...")
 
         page.wait_for_timeout(1000)
         distance_radio = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
         distance_radio.click()
-        print("  Selected: 'All coursework is via distance learning'")
 
         page.wait_for_timeout(1000)
 
@@ -490,24 +427,21 @@ def apply_education(page, card_data, app_type="faculty"):
         if reason_input and reason_input.is_visible():
             reason_input.fill("")
             reason_input.type("My education program uses a distance learning method", delay=50)
-            print("  Filled reason text")
             page.wait_for_timeout(1000)
 
         final_submit = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
-        final_text = final_submit.inner_text().strip()
-        print(f"  Final submit button text: '{final_text}'")
 
         if final_submit.is_disabled():
             raise Exception("Final submit button is disabled. Step 3 requirements not met.")
 
         page.wait_for_timeout(1000)
         final_submit.click()
-        print("Clicked 'Submit Application' (step 3)")
+        _log("Step 3 completed — final submission...")
 
         page.wait_for_timeout(5000)
 
     banner = page.query_selector('.Banner-message .Banner-title')
     if banner and "Your application has been submitted" in banner.inner_text().strip():
-        print("SUCCESS: Your application has been submitted.")
+        _log("Application submitted successfully!")
     else:
-        print(f"Application may not have been submitted. Current URL: {page.url}")
+        _log(f"Application status unclear — check: {page.url}")
