@@ -18,6 +18,8 @@ TWO_FA_SETUP_URL = "https://github.com/settings/two_factor_authentication/setup/
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OTP_DIR = os.path.join(BASE_DIR, "otp")
 
+DELAY = 2000
+
 
 def _log(msg):
     print(f"  {msg}")
@@ -28,10 +30,14 @@ def _err(msg):
     raise Exception(msg)
 
 
-def login_github(page, email, password):
-    page.goto(LOGIN_URL)
+def _goto(page, url):
+    page.goto(url)
     page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(DELAY)
+
+
+def login_github(page, email, password):
+    _goto(page, LOGIN_URL)
 
     current_url = page.url
     if "github.com/login" not in current_url and "sessions/two-factor" not in current_url:
@@ -46,14 +52,13 @@ def login_github(page, email, password):
 
     login_field = page.locator('input#login_field')
     login_field.wait_for(state="visible", timeout=10000)
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(DELAY)
     login_field.fill(email)
+    page.wait_for_timeout(DELAY)
 
     password_field = page.locator('input#password')
-    page.wait_for_timeout(500)
     password_field.fill(password)
-
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
 
     sign_in_btn = page.locator('input[name="commit"][value="Sign in"]')
     sign_in_btn.click()
@@ -115,7 +120,7 @@ def _handle_login_2fa(page, login_identifier):
 
     otp_input = page.locator('input#app_totp')
     otp_input.wait_for(state="visible", timeout=10000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
 
@@ -124,18 +129,19 @@ def _handle_login_2fa(page, login_identifier):
     current_url = page.url
     if "sessions/two-factor" not in current_url:
         page.wait_for_load_state("domcontentloaded")
+        page.wait_for_timeout(DELAY)
         return
 
     verify_btn = page.locator('button[type="submit"]:has-text("Verify")')
     if verify_btn.count() > 0 and verify_btn.first.is_visible():
         verify_btn.first.click(timeout=5000)
         page.wait_for_timeout(5000)
+        page.wait_for_load_state("domcontentloaded")
+        page.wait_for_timeout(DELAY)
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
         _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.")
-
-    page.wait_for_load_state("domcontentloaded")
 
 
 def _get_username_from_page(page):
@@ -152,15 +158,30 @@ def _get_username_from_page(page):
             username = meta.get_attribute("content")
 
     if not username:
+        page.wait_for_timeout(DELAY)
+        page.goto("https://github.com")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(DELAY)
+
+        cookies = page.context.cookies()
+        for cookie in cookies:
+            if cookie["name"] == "dotcom_user":
+                username = cookie["value"]
+                break
+
+        if not username:
+            meta = page.locator('meta[name="user-login"]')
+            if meta.count() > 0:
+                username = meta.get_attribute("content")
+
+    if not username:
         _err("Could not determine username — no 'dotcom_user' cookie or user meta tag found")
 
     return username
 
 
 def ensure_2fa(page, username):
-    page.goto(SECURITY_URL)
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    _goto(page, SECURITY_URL)
 
     not_enabled = page.query_selector('h2.blankslate-heading')
     if not_enabled and "not enabled yet" in not_enabled.inner_text().strip().lower():
@@ -175,21 +196,22 @@ def _setup_2fa(page, username):
 
     enable_btn = page.locator('a[href="/settings/two_factor_authentication/setup/intro"]')
     enable_btn.wait_for(state="visible", timeout=10000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     enable_btn.click()
 
     page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(DELAY)
 
     setup_key_btn = page.locator('span.Button-label:has-text("setup key")')
     setup_key_btn.wait_for(state="visible", timeout=15000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     setup_key_btn.click()
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(DELAY)
 
     secret_el = page.locator('[data-target="two-factor-setup-verification.mashedSecret"]')
     secret_el.wait_for(state="visible", timeout=10000)
+    page.wait_for_timeout(DELAY)
     secret = secret_el.inner_text().strip()
 
     secret_path = os.path.join(user_otp_dir, "secret.txt")
@@ -197,18 +219,18 @@ def _setup_2fa(page, username):
         f.write(secret)
     _log(f"TOTP secret saved")
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
 
     page.keyboard.press("Escape")
 
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(DELAY)
 
     totp = pyotp.TOTP(secret)
     otp_code = totp.now()
 
     otp_input = page.locator('input[data-target="two-factor-setup-verification.appOtpInput"]')
     otp_input.wait_for(state="visible", timeout=10000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
 
@@ -217,17 +239,17 @@ def _setup_2fa(page, username):
     download_btn = page.locator('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
     download_btn.wait_for(state="visible", timeout=30000)
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(DELAY)
 
     recovery_codes_text = _scrape_recovery_codes(page)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
 
     recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
     try:
         with page.expect_download(timeout=10000) as download_info:
             download_btn.click()
         download = download_info.value
-        page.wait_for_timeout(2000)
+        page.wait_for_timeout(DELAY)
         download.save_as(recovery_path)
     except Exception:
         with open(recovery_path, "w") as f:
@@ -235,14 +257,16 @@ def _setup_2fa(page, username):
 
     _log("Recovery codes saved")
 
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(DELAY)
 
     continue_btn = page.get_by_role("button", name="I have saved my recovery codes")
     continue_btn.wait_for(state="visible", timeout=10000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     continue_btn.click()
 
     page.wait_for_timeout(5000)
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(DELAY)
 
     _log("2FA enabled")
     return secret
@@ -268,15 +292,16 @@ def _scrape_recovery_codes(page):
 
 
 def update_profile_name(page, name):
-    page.goto(PROFILE_URL)
-    page.wait_for_load_state("domcontentloaded")
+    _goto(page, PROFILE_URL)
 
     name_input = page.query_selector('input[name="user[profile_name]"]')
     if not name_input:
         _err("Profile update failed — name input field not found on the page")
 
     name_input.fill("")
+    page.wait_for_timeout(DELAY)
     name_input.type(name)
+    page.wait_for_timeout(DELAY)
 
     submit_btn = page.query_selector('button[type="submit"] .Button-label')
     if not submit_btn:
@@ -284,20 +309,17 @@ def update_profile_name(page, name):
     if not submit_btn:
         _err("Profile update failed — submit button not found on the page")
 
-    page.wait_for_timeout(500)
-
     submit_btn.click()
 
     page.wait_for_timeout(3000)
     page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(DELAY)
 
     _log(f"Profile updated: {name}")
 
 
 def update_billing_address(page, first_name, last_name, address):
-    page.goto(BILLING_URL)
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    _goto(page, BILLING_URL)
 
     edit_btn = page.locator('button.js-edit-user-personal-profile')
     if edit_btn.count() == 0:
@@ -306,16 +328,19 @@ def update_billing_address(page, first_name, last_name, address):
         _err("Billing update failed — edit button not found on the page")
 
     edit_btn.first.wait_for(state="visible", timeout=10000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     edit_btn.first.click()
 
     page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=10000)
+    page.wait_for_timeout(DELAY)
 
     def fill_input(selector, value):
         el = page.query_selector(selector)
         if el:
             el.fill("")
+            page.wait_for_timeout(500)
             el.type(value)
+            page.wait_for_timeout(500)
 
     fill_input('#billing_contact_first_name', first_name)
     fill_input('#billing_contact_last_name', last_name)
@@ -325,12 +350,12 @@ def update_billing_address(page, first_name, last_name, address):
     country_select = page.query_selector('#billing_contact_country_code')
     if country_select:
         page.select_option('#billing_contact_country_code', 'ID')
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(DELAY)
 
     fill_input('#region_region', address['state_province'])
     fill_input('#billing_contact_postal_code', address['postal_code'])
 
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(DELAY)
 
     save_btn = page.query_selector('button[value="Save billing information"]')
     if not save_btn:
@@ -340,7 +365,9 @@ def update_billing_address(page, first_name, last_name, address):
 
     save_btn.click()
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(3000)
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(DELAY)
 
     _log(f"Billing updated: {address['city']}, {address['state_province']}")
 
@@ -395,15 +422,13 @@ def apply_education(page, card_data, app_type="faculty"):
 
     page.route("**/settings/education/developer_pack_applications", _make_intercept_handler(photo_proof_json))
 
-    page.goto(EDUCATION_URL)
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    _goto(page, EDUCATION_URL)
 
     start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=15000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     start_btn.click()
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(DELAY)
 
     if app_type == "faculty":
         radio_id = "#dev_pack_form_application_type_faculty"
@@ -411,24 +436,24 @@ def apply_education(page, card_data, app_type="faculty"):
         radio_id = "#dev_pack_form_application_type_student"
 
     radio = page.wait_for_selector(radio_id, state="visible", timeout=10000)
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     radio.click()
 
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(DELAY)
 
     school_input = page.wait_for_selector('#js-school-name-search', state="visible", timeout=10000)
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(DELAY)
     school_input.fill("")
     school_input.type(school_name, delay=100)
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(3000)
 
     page.wait_for_selector(
         '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection',
         state="visible",
         timeout=15000,
     )
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
 
     all_options = page.query_selector_all(
         '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection'
@@ -448,7 +473,7 @@ def apply_education(page, card_data, app_type="faculty"):
     selected_name = best_match.get_attribute('data-school-name') or best_match.inner_text().strip()
     best_match.click()
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(DELAY)
 
     input_val = school_input.input_value()
     if not input_val.strip():
@@ -456,39 +481,39 @@ def apply_education(page, card_data, app_type="faculty"):
 
     share_btn = page.query_selector('button:has-text("Share Location")')
     if share_btn and share_btn.is_visible():
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(DELAY)
         share_btn.click()
         page.wait_for_timeout(3000)
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
 
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
 
     if continue_btn.is_disabled():
         _err("Education application failed — continue button is disabled, step 1 requirements not met")
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     continue_btn.click()
 
     page.wait_for_timeout(5000)
 
     if app_type == "student":
         proof_btn = page.wait_for_selector('button:has-text("Select...")', state="visible", timeout=10000)
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(DELAY)
         proof_btn.click()
 
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(DELAY)
         id_card_option = page.wait_for_selector('[role="option"]:has-text("ID")', state="visible", timeout=10000)
         id_card_option.click()
 
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(DELAY)
 
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
     if submit_btn.is_disabled():
         _err("Education application failed — submit button is disabled, step 2 requirements not met")
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(DELAY)
     submit_btn.click()
 
     page.wait_for_timeout(5000)
@@ -496,24 +521,25 @@ def apply_education(page, card_data, app_type="faculty"):
     location_mismatch = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
     if location_mismatch and location_mismatch.is_visible():
 
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(DELAY)
         distance_radio = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
         distance_radio.click()
 
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(DELAY)
 
         reason_input = page.query_selector('#dev_pack_form_other_reason_text')
         if reason_input and reason_input.is_visible():
             reason_input.fill("")
+            page.wait_for_timeout(DELAY)
             reason_input.type("My education program uses a distance learning method", delay=50)
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(DELAY)
 
         final_submit = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
         if final_submit.is_disabled():
             _err("Education application failed — submit button is disabled, step 3 requirements not met")
 
-        page.wait_for_timeout(1000)
+        page.wait_for_timeout(DELAY)
         final_submit.click()
 
         page.wait_for_timeout(5000)
