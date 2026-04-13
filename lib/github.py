@@ -111,7 +111,7 @@ def _setup_2fa(page, username):
 
     page.wait_for_timeout(1500)
 
-    continue_btn = page.locator('button[data-action="click:single-page-wizard-step#onNext"][data-target="single-page-wizard-step.nextButton"]')
+    continue_btn = page.get_by_role("button", name="I have saved my recovery codes")
     continue_btn.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     continue_btn.click()
