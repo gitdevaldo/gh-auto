@@ -309,4 +309,8 @@ def apply_education(page, card_data, app_type="faculty"):
 
         page.wait_for_timeout(5000)
 
-    print(f"Current URL after submit: {page.url}")
+    banner = page.query_selector('.Banner-message .Banner-title')
+    if banner and "Your application has been submitted" in banner.inner_text().strip():
+        print("SUCCESS: Your application has been submitted.")
+    else:
+        print(f"Application may not have been submitted. Current URL: {page.url}")
