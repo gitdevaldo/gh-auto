@@ -228,7 +228,22 @@ def apply_education(page, card_data, app_type="faculty"):
     share_btn = page.query_selector('button:has-text("Share Location")')
     if share_btn and share_btn.is_visible():
         share_btn.click()
-        print("Clicked 'Share Location' — geolocation already granted via context")
+        print("Clicked 'Share Location'")
+
+        for i in range(20):
+            page.wait_for_timeout(500)
+            still_visible = page.query_selector('button:has-text("Share Location")')
+            if not still_visible or not still_visible.is_visible():
+                print("  Location shared successfully (button disappeared)")
+                break
+            location_result = page.query_selector('.js-location-result, .location-check-result, [data-location-detected]')
+            if location_result:
+                print(f"  Location result appeared: '{location_result.inner_text().strip()[:60]}'")
+                break
+        else:
+            print("  WARNING: Share Location button still visible after waiting — location may not have been accepted")
+            page.screenshot(path="debug_share_location.png")
+
         page.wait_for_timeout(2000)
     else:
         print("  'Share Location' button not found or not visible, skipping")
