@@ -1,7 +1,7 @@
 [
     {
         "domain": "github.com",
-        "expirationDate": 1777290868.027232,
+        "expirationDate": 1777291868.776347,
         "hostOnly": true,
         "httpOnly": true,
         "name": "__Host-user_session_same_site",
@@ -10,11 +10,11 @@
         "secure": true,
         "session": false,
         "storeId": null,
-        "value": "2vm7gvZvTfjHJl8tONuILXeCQjtonShPS_FsnTuqTimg1ddq"
+        "value": "1DwjpLigq2UdxG8wrVkwOfCX7n0k35PMtnlXyOa8-IrDjtya"
     },
     {
         "domain": ".github.com",
-        "expirationDate": 1807615400.498822,
+        "expirationDate": 1807618268.776544,
         "hostOnly": false,
         "httpOnly": true,
         "name": "dotcom_user",
@@ -52,7 +52,7 @@
     },
     {
         "domain": "github.com",
-        "expirationDate": 1807615375.597709,
+        "expirationDate": 1807618254.290978,
         "hostOnly": true,
         "httpOnly": false,
         "name": "MicrosoftApplicationsTelemetryDeviceId",
@@ -78,7 +78,7 @@
     },
     {
         "domain": "github.com",
-        "expirationDate": 1783855400.497104,
+        "expirationDate": 1783858268.776124,
         "hostOnly": true,
         "httpOnly": true,
         "name": "saved_user_sessions",
@@ -87,7 +87,7 @@
         "secure": true,
         "session": false,
         "storeId": null,
-        "value": "275156113%3A2vm7gvZvTfjHJl8tONuILXeCQjtonShPS_FsnTuqTimg1ddq"
+        "value": "275156113%3A1DwjpLigq2UdxG8wrVkwOfCX7n0k35PMtnlXyOa8-IrDjtya"
     },
     {
         "domain": "github.com",
@@ -112,7 +112,7 @@
         "secure": true,
         "session": true,
         "storeId": null,
-        "value": "O%2F%2BOq5F%2FTpeuBPcatiH%2B0n6D7GnuqBWxEgPy979IkMG1QqGfPPd05Adks%2BylztNz0ruGXtz54wPYaFyMq2z6Y488ju9HvJQcWBkdpYpndjB%2B4JPymDrJ1uDgMRMVxVX8SCjOqLCphzQOjdq4KAq89W43dWui1qHE%2B5K5HpxpXpaLBy0Qh8ND7tL20KKmi4QkR%2Bo22UfUwCfWWBylLy4REWHOP7T9EXOIZrW8CsM52XvEZPPoBodreQ3k0mdU6de%2B0aYJ4H6ZkhJWyFqwAHyGoL6%2F1dR%2BB%2B6FJhj8uFxQ70vY8dmxZwj%2B4Dv6Xi1wr8mNdterwE7dX%2Bxod%2BXXtumKdB4xcJ77UHDKZ5ba55srRltQuucq8rc6jDS2dLZp5gB59hrg7IEV2spsFS3KFC28ZBt%2Fc%2BBxMVtucWApqIxErIRfC0ONbgTGwptiV7PJ4QgqWcv6k5sFm2Ix%2BMJSFFofvbjQNpCSJX1UAd3B5lVot%2Ff9CSF2B1DGvulZsDLJ7%2BFE6PkHZ9WAgFiHOuorz8a%2B%2BFtSxxffchs5zqJ4FioS4S%2F214MN5naCPl0SwW%2FHe4tQ5mSCH%2FhHbrIccpE5eUdbLQvGc248fsxhxjf%2BPdQGN9Rsuz9IKq96yFnHdjaY%2BrPSIx9HWhSEpYXTT8gDqT1FzrQHVFSIl6tFR6EKp8j8f8D494RC%2BjfHAruhhYE0w94%2F2hMM3vuz3TV2EX%2FxithOkrG5%2F%2Bww9wu1q4Y%2BgCLchLbHUmdAhMpNqxjm4hrtq%2FuU7%2FOGvZaD60f%2BrEk9VZPb9ZCZB4HQk%2B077ZeqaKG1GE%2FW7HyVReIlp3me1gxLt7qYuavT3ioBw4YW19rdJCDShJ%2B191l4EUW4d0VzZpedfR8f62fJSS03AUuwcfkJU0cherZvwTCiuuuhmvgnR06zp14KFqiwyLV2G%2BD6DLTofVLayfCAycV55%2FB69aZ5hGJVZvYdcqHfTjFAr61UaaqhMDBnX4djj1lU5qqT%2FsWIFXV12fOl7xt9%2BG4DUV2kdwEERcTZdaPaWhP3BTa20%2BfDscYYrKLGWE%2F6bqDTFBLE8WlOjeulaLB7fSP6KGwe1dasw1YlKddIwc5bvMl53LQhRTU8YtbklmoR1f5yyJt6R4OgOx0kZ9ohq6udigaUCwBWsb%2BLTnpPVPjR4BwxA6l%2BwgMpk7zvFWhS%2BWfOisOBoxZ%2BmesE4nXYA94XZKMxXKfekBVZtLqPMK76rz8A7i%2F9qJexTaw4UPBRPGOnb7OqzwwkeTaZfCfBqWVPBdmLG5FINKyuz9PKSKOtGJ82UCd%2FqQ16JdamPAxCIaLxW1qqDLnD0SjwLFOYs%2BapG9I1JKjc5yqK%2Fgyp0EjlVsbyBa9el9QX5JxUiwjIuVxtE4Cx%2B9d6OojCVzpUHpGBZjExu%2BFmO4UkqLfgomUECPZ3ZkU4bXDDbqo7yCeu0jzxcDipcITFki%2Bdm%2BUbXiyieZb1kjdU%2BTDsXUz%2F2Gfmd62WoqnZ8y%2B6Mg9iMZwo5P5eZm4cBXRylLkSwxVdxvkhjTcJbRWUQ%2BQ4jF1yE6nHbgzzCbicABJyIVI%2FWAScdGcabWBghFKa87NgG98RS0rL5sDHw2zxaXm7GbXenFkr7jTpTjsUKp98NqO5JyQgtgh8Ol2mvoQ0hrCgVh814gRhZRTkNY0yOEu8F4t92lYzLaXzIFf182ffx%2FLXezD9YKkSJrWegGMws89eQj9hCgCg%2FVpH8C1dWuSlr8tEt0EboJ3bWA%2FoYHhOI0iRhXWB--EUqiL16wo6n9QPjL--yyPK3NosNd4THz3W1PSbTw%3D%3D"
+        "value": "iE7CHnyvfgp7x6nFmxucPr8424kGSrYvTOgx5FImbTFNyxnWQ4ENpQYtwsA6aMAT9FTI4WucID9XDKfLUQUwTGC11Eb8VD27tohUhREe%2F2asVZVxGHBE64mn1BjV9JKNcInQBvxOtErpc7e5HNNsuC07CBGQLs71aEjny1EPpleG4i%2Bwn%2FA99%2FnFdOcK%2B1DczxmfT1UMG5mcFNjGWy6zdPrbjhjAllGireHJLdr0It44u3cgrAgbawKQT4iQ1q2uebwYsov%2BraCZwJ%2BQzJoEmMwy%2BJdRPOM%2FgpMqPhgVeVclOV8WG%2B8hs%2BOe%2B2XaCDXgkRzqE1NQ9AZejCITcs7NpvdH7Clb70AGAPfC7SULgbK%2FL9JeDcpxB2Q0tntHo67a4D5sTXb4t2skruRjVJYKU22g6eQTGZNEtJiveIo0%2Fa9%2BW6OEuQegwZOk8uNQzpI6gJeWjGMcbsDqcMCmYeJmSr6JPYUDpgS9ppn5LDebmhBSMD0hM3cyBdaGTkeNG%2FphBclnw5sc4Ji%2BzBBBY9klmHtGNOQinTrVBz%2FGUQXqZ6K7m1vSzXhG4sQeDJRObEfbNbxRW%2B8c5%2BloJitRB9E%2FXMGEKB3FH5J1g72e08wQsqFQKJRLO%2FWJ1%2FX2jI2%2BEFOKjGwoTctAtCrFOBt4tYOrWnw38t2Ye0jMxASk9rSFsrNrP7oxYXFcG3nhIcJ%2FyQDKE3pzbqnte7J0PVPFkua1JTg503vByWMHQqn43RWBXdJfNtWvilu1DCeFtPBl3LNTLHpmq8WgaeiuIw%2FhdFTlwgJ8BpSBOrPXSpwdWfMGir5Nbypxb4GPTpax8V5d9qQRU5lfqjwtb5xpVxOMLGn2flGbz2JWYOZEeSY%2Fj%2B4kK%2BLDzalxCpXBTaCi1ETqEl8KwYbSVpHFXn05S0D3xvrBuS%2FSIVfg3Z9ha3WWYNogmnzy1uIi%2FWz6JdLLG7KT0YToAGQ7Cv1rjPMluqQGeJ6BhfqODr%2FydV2YqoC%2FgOxXIADgHV%2BtpiNMr1maWyLSWoRAlj7lDwhOpfOaolP63OW88xUbBt8%2Bj1MJFhfViU%2Fqhidsh39G--je8%2Fbc5Vq5Gv4rwb--o9G4qjwHFT3lwWYjDoL7OA%3D%3D"
     },
     {
         "domain": ".github.com",
@@ -126,6 +126,19 @@
         "session": false,
         "storeId": null,
         "value": "GH1.1.213816872.1775845598"
+    },
+    {
+        "domain": ".github.com",
+        "expirationDate": 1776084054,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "ai_session",
+        "path": "/",
+        "sameSite": "no_restriction",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "SUtwGybPSrQizrwSRi9B97|1776082254300|1776082254300"
     },
     {
         "domain": ".github.com",
@@ -149,11 +162,11 @@
         "secure": true,
         "session": true,
         "storeId": null,
-        "value": "1776079405432"
+        "value": "1776082268300"
     },
     {
         "domain": ".github.com",
-        "expirationDate": 1807615400.498182,
+        "expirationDate": 1807618268.776475,
         "hostOnly": false,
         "httpOnly": true,
         "name": "logged_in",
@@ -202,7 +215,7 @@
     },
     {
         "domain": "github.com",
-        "expirationDate": 1777290868.026936,
+        "expirationDate": 1777291868.776279,
         "hostOnly": true,
         "httpOnly": true,
         "name": "user_session",
@@ -211,6 +224,6 @@
         "secure": true,
         "session": false,
         "storeId": null,
-        "value": "2vm7gvZvTfjHJl8tONuILXeCQjtonShPS_FsnTuqTimg1ddq"
+        "value": "1DwjpLigq2UdxG8wrVkwOfCX7n0k35PMtnlXyOa8-IrDjtya"
     }
 ]
