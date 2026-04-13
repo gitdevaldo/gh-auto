@@ -145,82 +145,6 @@ def _make_intercept_handler(photo_proof_json):
     return handle
 
 
-SESSION_KEYWORDS = ["signed in with another tab", "signed out in another tab", "switched accounts on another tab"]
-
-
-def _find_session_banner(page):
-    for el in page.query_selector_all('.flash-error, .flash-warn, .flash'):
-        text = el.inner_text().strip().lower()
-        for keyword in SESSION_KEYWORDS:
-            if keyword in text:
-                return el
-    return None
-
-
-def _dismiss_session_banner(page, navigate_url=None):
-    banner = _find_session_banner(page)
-    if not banner:
-        return False
-    text = banner.inner_text().strip()
-    print(f"  Session banner detected: '{text[:80]}...'")
-    dismiss_btn = banner.query_selector('button, [aria-label="Dismiss"]')
-    if dismiss_btn:
-        dismiss_btn.click()
-        page.wait_for_timeout(500)
-    if navigate_url:
-        print(f"  Re-navigating to {navigate_url}")
-        page.goto(navigate_url, wait_until="domcontentloaded")
-    else:
-        page.reload(wait_until="domcontentloaded")
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
-    print("  Page ready after session banner dismissal")
-    return True
-
-
-def _get_step_indicator(page):
-    step_el = page.query_selector('[data-current-step]')
-    if step_el:
-        return step_el.get_attribute('data-current-step')
-    active_step = page.query_selector('.education-step.active, .education-step--current')
-    if active_step:
-        return active_step.get_attribute('data-step') or active_step.inner_text().strip()
-    submit_btn = page.query_selector('#js-developer-pack-application-submit-button')
-    if submit_btn:
-        btn_text = submit_btn.inner_text().strip().lower()
-        if "continue" in btn_text:
-            return "step1"
-        elif "submit" in btn_text:
-            return "step2"
-    return None
-
-
-def _wait_for_step_change(page, previous_step, description, timeout=15000):
-    import time
-    deadline = time.time() + timeout / 1000
-    while time.time() < deadline:
-        if _find_session_banner(page):
-            print(f"  Session banner appeared during step transition — dismissing")
-            _dismiss_session_banner(page, navigate_url=EDUCATION_URL)
-            continue
-
-        error_el = page.query_selector('.flash-error, .Banner--error')
-        if error_el:
-            err_text = error_el.inner_text().strip()
-            if err_text:
-                page.screenshot(path="debug_step_error.png")
-                raise Exception(f"Step transition failed ({description}): {err_text}")
-
-        current = _get_step_indicator(page)
-        if current and current != previous_step:
-            print(f"  Step advanced: '{previous_step}' -> '{current}' ({description})")
-            return current
-        page.wait_for_timeout(300)
-
-    page.screenshot(path="debug_step_timeout.png")
-    raise Exception(f"Step did not advance after '{description}' (timed out). Still on '{previous_step}'.")
-
-
 def apply_education(page, card_data, app_type="faculty"):
     school_name = card_data.get("schoolName", "")
     image_b64 = card_data.get("imageBase64", "")
@@ -235,22 +159,12 @@ def apply_education(page, card_data, app_type="faculty"):
     page.route("**/settings/education/developer_pack_applications", _make_intercept_handler(photo_proof_json))
     print("Route interceptor installed for developer_pack_applications")
 
-    page.goto("https://github.com", wait_until="domcontentloaded")
-    page.wait_for_timeout(1500)
-    print("Refreshed GitHub session before education page")
-
-    page.goto(EDUCATION_URL, wait_until="domcontentloaded")
+    page.goto(EDUCATION_URL)
     page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(1000)
     print("Navigated to education benefits page")
 
-    if _dismiss_session_banner(page, navigate_url=EDUCATION_URL):
-        if _find_session_banner(page):
-            page.screenshot(path="debug_session_banner_persist.png")
-            raise Exception("Session banner persists after reload — cookies may be expired")
-
     start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=15000)
-    print(f"  Found 'Start an application' button")
+    page.wait_for_timeout(500)
     start_btn.click()
     print("Clicked 'Start an application'")
 
@@ -319,23 +233,26 @@ def apply_education(page, card_data, app_type="faculty"):
     else:
         print("  'Share Location' button not found or not visible, skipping")
 
-    step_before = _get_step_indicator(page)
-    print(f"  Current step indicator before Continue: '{step_before}'")
-
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
-    btn_text_before = continue_btn.inner_text().strip()
-    print(f"  Button text: '{btn_text_before}'")
+    btn_text = continue_btn.inner_text().strip()
+    print(f"  Continue button text: '{btn_text}'")
 
     if continue_btn.is_disabled():
-        print("  WARNING: Continue button is disabled — something may be missing in step 1")
         page.screenshot(path="debug_step1_disabled.png")
         raise Exception("Continue button is disabled. Step 1 requirements not met.")
 
     continue_btn.click()
     print("Clicked 'Continue'")
 
-    step_after = _wait_for_step_change(page, step_before, "Continue to step 2", timeout=15000)
-    print(f"  Confirmed step transition: now on '{step_after}'")
+    page.wait_for_timeout(3000)
+
+    submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
+    new_btn_text = submit_btn.inner_text().strip()
+    print(f"  Button text after Continue: '{new_btn_text}'")
+
+    if "continue" in new_btn_text.lower():
+        page.screenshot(path="debug_step_not_advanced.png")
+        raise Exception("Step did not advance — still showing 'Continue'. Check if school/location was accepted.")
 
     if app_type == "student":
         proof_btn = page.wait_for_selector('button:has-text("Select...")', state="visible", timeout=10000)
@@ -348,11 +265,7 @@ def apply_education(page, card_data, app_type="faculty"):
 
         page.wait_for_timeout(500)
 
-    submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
-    print(f"  Submit button text: '{submit_btn.inner_text().strip()}'")
-
     if submit_btn.is_disabled():
-        print("  WARNING: Submit button is disabled — step 2 requirements not met")
         page.screenshot(path="debug_step2_disabled.png")
         raise Exception("Submit button is disabled. Step 2 requirements not met.")
 
@@ -361,19 +274,6 @@ def apply_education(page, card_data, app_type="faculty"):
 
     page.wait_for_timeout(5000)
 
-    banner = page.query_selector('.Banner-message')
-    if banner:
-        msg = banner.inner_text().strip()
-        print(f"Education application result: {msg}")
-    else:
-        error_el = page.query_selector('.flash-error, .flash-warn, .Banner--error')
-        if error_el:
-            err_msg = error_el.inner_text().strip()
-            print(f"ERROR after submit: {err_msg}")
-            page.screenshot(path="debug_submit_error.png")
-            raise Exception(f"Submit failed: {err_msg}")
-        else:
-            print("Submit completed — checking page state...")
-            print(f"Current URL: {page.url}")
-            page.screenshot(path="debug_final_state.png")
-            print("Saved screenshot of final state to debug_final_state.png")
+    print(f"Current URL after submit: {page.url}")
+    page.screenshot(path="debug_final_state.png")
+    print("Saved screenshot of final state to debug_final_state.png")
