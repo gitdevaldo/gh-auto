@@ -31,5 +31,8 @@ def open_browser(username, cookies, geolocation=None):
         permissions=["geolocation"],
     )
     ctx = context.__enter__()
+    ctx.clear_cookies()
+    print("Cleared old cookies from persistent profile")
     ctx.add_cookies(format_cookies(cookies))
+    print("Loaded fresh cookies into browser context")
     return context, ctx

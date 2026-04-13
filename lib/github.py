@@ -145,6 +145,21 @@ def _make_intercept_handler(photo_proof_json):
     return handle
 
 
+def _dismiss_session_banner(page):
+    session_banner = page.query_selector('.flash-error, .flash-warn')
+    if session_banner:
+        text = session_banner.inner_text().strip()
+        if "signed in with another tab" in text.lower() or "signed out" in text.lower() or "switched accounts" in text.lower():
+            print(f"  Session banner detected: '{text[:80]}...' — reloading page")
+            dismiss_btn = session_banner.query_selector('button, [aria-label="Dismiss"]')
+            if dismiss_btn:
+                dismiss_btn.click()
+                page.wait_for_timeout(500)
+            page.reload(wait_until="domcontentloaded")
+            page.wait_for_timeout(1000)
+            print("  Page reloaded after session banner")
+
+
 def _get_step_indicator(page):
     step_el = page.query_selector('[data-current-step]')
     if step_el:
@@ -168,8 +183,13 @@ def _wait_for_step_change(page, previous_step, description, timeout=15000):
     while time.time() < deadline:
         error_el = page.query_selector('.flash-error, .flash-warn, .Banner--error')
         if error_el:
+            err_text = error_el.inner_text().strip()
+            if "signed in with another tab" in err_text.lower() or "signed out" in err_text.lower() or "switched accounts" in err_text.lower():
+                print(f"  Session banner appeared during step transition — dismissing")
+                _dismiss_session_banner(page)
+                continue
             page.screenshot(path="debug_step_error.png")
-            raise Exception(f"Step transition failed ({description}): {error_el.inner_text().strip()}")
+            raise Exception(f"Step transition failed ({description}): {err_text}")
 
         current = _get_step_indicator(page)
         if current and current != previous_step:
@@ -198,6 +218,8 @@ def apply_education(page, card_data, app_type="faculty"):
     page.goto(EDUCATION_URL)
     page.wait_for_load_state("domcontentloaded")
     print("Navigated to education benefits page")
+
+    _dismiss_session_banner(page)
 
     start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=10000)
     start_btn.click()
