@@ -1,0 +1,63 @@
+How we should do it?
+
+This should be run before every step that we have build. 
+
+Step 1
+Check the 2FA status on https://github.com/settings/security. The 2FA is disabled when you found this
+<h2 data-view-component="true" class="blankslate-heading">      Two-factor authentication is not enabled yet.
+</h2>
+
+Step 2
+Enable the 2FA by clicking 
+<a data-turbo="false" href="/settings/two_factor_authentication/setup/intro" data-view-component="true" class="Button--primary Button--medium Button">  <span class="Button-content">
+    <span class="Button-label">Enable two-factor authentication</span>
+  </span>
+</a>
+
+Step 3
+After click button on step 2, it'll be redirect to https://github.com/settings/two_factor_authentication/setup/intro and we need to click this to show the secret.
+<span class="Button-content">
+    <span class="Button-label">setup key</span>
+  </span>
+
+Step 4
+After click the step 3, pop up will be appear and copy the secret:
+<div class="text-mono f5 tmp-p-3" data-target="two-factor-setup-verification.mashedSecret">5FXNIPLNZY23UA3X</div>. 
+
+Then close it by click X (this element) or click outside of the random area until popup is missing.
+<svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x">
+    <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
+</svg>
+
+After we got the secret, save it and use for the get OTP later.
+
+Step 5
+Get the first OTP from the secret and put it on the box
+<input required="required" placeholder="XXXXXX" pattern="[0-9]{6}" autocomplete="off" value="" class="form-control width-fit" aria-label="Verify the code from the app" data-action="input:two-factor-setup-verification#otpChange" data-target="two-factor-setup-verification.appOtpInput" type="text" name="otp"> then after you put the otp, the SPA will be changed without an refresh/realod, like an SPA/ajax.
+
+Step 6
+After auto move from step 5, you will be find <h2 class="wizard-step-title f3">Download your recovery codes</h2> and you need to download the recovery codes by click <button data-action="click:two-factor-setup-recovery-codes#onDownloadClick" type="button" data-view-component="true" class="btn-primary btn">    <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-download mr-2 tmp-mr-2">
+    <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"></path><path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"></path>
+</svg>Download
+</button>.
+
+After that, a file will be downloaded and the continue button will be clickable. You need to save that file.
+Continue button is:
+<button data-action="click:single-page-wizard-step#onNext" data-target="single-page-wizard-step.nextButton" type="button" data-view-component="true" class="wizard-step-button btn-primary btn d-flex flex-items-center width-fit">    I have saved my recovery codes
+                <span class="d-flex ml-2" hidden="" data-target="single-page-wizard-step.nextButtonSpinner">
+                  <span data-view-component="true">
+  <svg style="box-sizing: content-box; color: var(--color-icon-primary);" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" data-view-component="true" class="color-fg-on-emphasis anim-rotate">
+    <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" vector-effect="non-scaling-stroke" fill="none"></circle>
+    <path d="M15 8a7.002 7.002 0 00-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+</svg>    <span class="sr-only">Loading</span>
+</span>
+                </span>
+</button>
+
+When all done, the page moved with this head
+<h1 class="text-center text-light mx-auto" style="width: 80%;">Two-factor authentication (2FA) is now enabled for your GitHub account</h1>
+
+After everything is completed, please do this:
+add the secret in new text file and the recovery code file text. 
+
+Make the folder /otp/{username}/ and placed the 2 files here.

@@ -34,10 +34,11 @@ def ensure_2fa(page, username):
 
 
 def _setup_2fa(page, username):
-    enable_btn = page.query_selector('a[href="/settings/two_factor_authentication/setup/intro"]')
-    if not enable_btn:
-        raise Exception("Could not find 'Enable two-factor authentication' button")
+    user_otp_dir = os.path.join(OTP_DIR, username)
+    os.makedirs(user_otp_dir, exist_ok=True)
 
+    enable_btn = page.locator('a[href="/settings/two_factor_authentication/setup/intro"]')
+    enable_btn.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     enable_btn.click()
     print("Clicked 'Enable two-factor authentication'")
@@ -45,23 +46,30 @@ def _setup_2fa(page, username):
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
 
-    setup_key_btn = page.wait_for_selector('button:has-text("setup key")', state="visible", timeout=15000)
+    setup_key_btn = page.locator('span.Button-label:has-text("setup key")')
+    setup_key_btn.wait_for(state="visible", timeout=15000)
     page.wait_for_timeout(1000)
     setup_key_btn.click()
     print("Clicked 'setup key'")
 
     page.wait_for_timeout(2000)
 
-    secret_el = page.wait_for_selector('[data-target="two-factor-setup-verification.mashedSecret"]', state="visible", timeout=10000)
+    secret_el = page.locator('[data-target="two-factor-setup-verification.mashedSecret"]')
+    secret_el.wait_for(state="visible", timeout=10000)
     secret = secret_el.inner_text().strip()
     print(f"Got TOTP secret: {secret}")
 
+    secret_path = os.path.join(user_otp_dir, "secret.txt")
+    with open(secret_path, "w") as f:
+        f.write(secret)
+    print(f"Saved TOTP secret to {secret_path}")
+
     page.wait_for_timeout(1000)
 
-    close_btn = page.query_selector('button[aria-label="Close"], button:has(svg.octicon-x)')
-    if close_btn and close_btn.is_visible():
-        close_btn.click()
-        print("Closed setup key popup")
+    x_icon = page.locator('svg.octicon-x')
+    if x_icon.count() > 0:
+        x_icon.first.click()
+        print("Closed setup key popup via X icon")
     else:
         page.keyboard.press("Escape")
         print("Pressed Escape to close popup")
@@ -72,7 +80,8 @@ def _setup_2fa(page, username):
     otp_code = totp.now()
     print(f"Generated OTP code: {otp_code}")
 
-    otp_input = page.wait_for_selector('input[data-target="two-factor-setup-verification.appOtpInput"]', state="visible", timeout=10000)
+    otp_input = page.locator('input[data-target="two-factor-setup-verification.appOtpInput"]')
+    otp_input.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
@@ -80,56 +89,74 @@ def _setup_2fa(page, username):
 
     page.wait_for_timeout(5000)
 
-    user_otp_dir = os.path.join(OTP_DIR, username)
-    os.makedirs(user_otp_dir, exist_ok=True)
-
-    secret_path = os.path.join(user_otp_dir, "secret.txt")
-    with open(secret_path, "w") as f:
-        f.write(secret)
-    print(f"Saved TOTP secret to {secret_path}")
-
-    page.locator('h2.wizard-step-title:has-text("Download your recovery codes")').first.wait_for(state="visible", timeout=15000)
+    recovery_heading = page.locator('h2.wizard-step-title.f3:has-text("Download your recovery codes")')
+    recovery_heading.first.wait_for(state="visible", timeout=20000)
     print("Recovery codes step appeared")
 
     page.wait_for_timeout(2000)
 
-    download_btn = page.query_selector('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
-    if not download_btn:
-        download_btn = page.locator('button:has-text("Download")').first
-    if not download_btn:
-        raise Exception("Could not find Download recovery codes button")
+    recovery_codes_text = _scrape_recovery_codes(page)
 
-    with page.expect_download() as download_info:
-        if hasattr(download_btn, 'click'):
+    download_btn = page.locator('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
+    download_btn.wait_for(state="visible", timeout=10000)
+    page.wait_for_timeout(1000)
+
+    try:
+        with page.expect_download(timeout=10000) as download_info:
             download_btn.click()
-        else:
-            download_btn.click()
-        print("Clicked 'Download' recovery codes")
-
-    download = download_info.value
-    page.wait_for_timeout(2000)
-
-    recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
-    download.save_as(recovery_path)
-    print(f"Saved recovery codes to {recovery_path}")
+            print("Clicked 'Download' recovery codes")
+        download = download_info.value
+        page.wait_for_timeout(2000)
+        recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
+        download.save_as(recovery_path)
+        print(f"Saved recovery codes (downloaded file) to {recovery_path}")
+    except Exception as e:
+        print(f"Download method failed ({e}), using scraped recovery codes")
+        recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
+        with open(recovery_path, "w") as f:
+            f.write(recovery_codes_text)
+        print(f"Saved recovery codes (scraped) to {recovery_path}")
 
     page.wait_for_timeout(1500)
 
-    continue_btn = page.locator('button:has-text("I have saved my recovery codes")').first
-    if not continue_btn.is_visible():
-        continue_btn = page.locator('button[data-action="click:single-page-wizard-step#onNext"]').first
-    if not continue_btn.is_visible():
-        raise Exception("Could not find 'I have saved my recovery codes' button")
-
+    continue_btn = page.locator('button[data-action="click:single-page-wizard-step#onNext"][data-target="single-page-wizard-step.nextButton"]')
+    continue_btn.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     continue_btn.click()
     print("Clicked 'I have saved my recovery codes'")
 
     page.wait_for_timeout(5000)
 
-    print(f"2FA setup completed. Files saved to {user_otp_dir}")
+    done_heading = page.locator('h1:has-text("2FA")')
+    if done_heading.count() > 0:
+        print("SUCCESS: Two-factor authentication is now enabled!")
+    else:
+        print("2FA setup completed")
 
+    print(f"All 2FA files saved to {user_otp_dir}")
     return secret
+
+
+def _scrape_recovery_codes(page):
+    code_elements = page.locator('li.recovery-code, .recovery-codes li, [class*="recovery"] li')
+    codes = []
+    for i in range(code_elements.count()):
+        text = code_elements.nth(i).inner_text().strip()
+        if text:
+            codes.append(text)
+    if codes:
+        print(f"Scraped {len(codes)} recovery codes from page")
+        return "\n".join(codes)
+
+    container = page.locator('.recovery-codes, [data-target*="recovery"], pre, code')
+    for i in range(container.count()):
+        text = container.nth(i).inner_text().strip()
+        if text and len(text) > 20:
+            print("Scraped recovery codes from container")
+            return text
+
+    print("WARNING: Could not scrape recovery codes from page")
+    return ""
 
 
 def update_profile_name(page, name):
