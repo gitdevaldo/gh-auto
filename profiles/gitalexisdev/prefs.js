@@ -27,7 +27,7 @@ user_pref("browser.policies.runOncePerModification.extensionsUninstall", "[\"goo
 user_pref("browser.proton.toolbar.version", 3);
 user_pref("browser.sessionstore.upgradeBackup.latestBuildID", "20250315105650");
 user_pref("browser.startup.couldRestoreSession.count", 2);
-user_pref("browser.startup.lastColdStartupCheck", 1776074840);
+user_pref("browser.startup.lastColdStartupCheck", 1776077565);
 user_pref("browser.theme.content-theme", 0);
 user_pref("browser.theme.toolbar-theme", 0);
 user_pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"customizableui-special-spring1\",\"vertical-spacer\",\"urlbar-container\",\"customizableui-special-spring2\",\"save-to-pocket-button\",\"downloads-button\",\"fxa-toolbar-menu-button\",\"unified-extensions-button\",\"ublock0_raymondhill_net-browser-action\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"vertical-tabs\":[],\"PersonalToolbar\":[\"personal-bookmarks\"]},\"seen\":[\"developer-button\",\"ublock0_raymondhill_net-browser-action\"],\"dirtyAreaCache\":[\"nav-bar\",\"vertical-tabs\",\"toolbar-menubar\",\"TabsToolbar\",\"PersonalToolbar\"],\"currentVersion\":21,\"newElementCount\":2}");
@@ -64,7 +64,7 @@ user_pref("privacy.sanitize.pending", "[]");
 user_pref("security.sandbox.warn_unprivileged_namespaces", false);
 user_pref("sidebar.backupState", "{\"width\":\"\",\"command\":\"\",\"expanded\":false,\"hidden\":true}");
 user_pref("signon.management.page.os-auth.optout", "MDIEEPgAAAAAAAAAAAAAAAAAAAEwFAYIKoZIhvcNAwcECH8UHMSuRcs/BAhfNF4Zh4EKVA==");
-user_pref("toolkit.startup.last_success", 1776074831);
+user_pref("toolkit.startup.last_success", 1776077553);
 user_pref("toolkit.telemetry.cachedClientID", "c0ffeec0-ffee-c0ff-eec0-ffeec0ffeec0");
 user_pref("toolkit.telemetry.cachedProfileGroupID", "decafdec-afde-cafd-ecaf-decafdecafde");
 user_pref("toolkit.telemetry.previousBuildID", "20250315105650");
