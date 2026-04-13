@@ -17,10 +17,6 @@ def log(msg):
     print(f"  {msg}")
 
 
-def header(title):
-    print(f"\n--- {title} ---")
-
-
 def cleanup_profile(profile_name):
     profile_dir = get_profile_dir(profile_name)
     if os.path.exists(profile_dir):
@@ -38,7 +34,7 @@ def main():
                         help="Send success report to this email address")
     args, remaining = parser.parse_known_args()
 
-    header("Preparing Data")
+    print()
 
     card_data = get_card_data()
     name = card_data["name"]
@@ -57,74 +53,54 @@ def main():
 
         profile_name = email
 
-        header("Opening Browser")
-        log(f"Profile: {profile_name}")
         context, ctx = open_browser_fresh(profile_name)
         try:
             page = ctx.new_page()
 
-            header("Logging In")
             username = login_github(page, email, password)
 
-            header("Two-Factor Authentication")
             ensure_2fa(page, username)
 
-            header("Updating Profile")
             update_profile_name(page, name)
 
-            header("Updating Billing Address")
             update_billing_address(page, first_name, last_name, address)
 
-            header("Applying for Education Benefits")
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
 
         if args.report:
-            header("Sending Report")
             if send_report(args.report, username, card_data, address, args.type):
-                log(f"Report sent to: {args.report}")
-            else:
-                log("Report could not be sent")
+                log(f"Report sent → {args.report}")
 
         cleanup_profile(profile_name)
     else:
         cookies = load_cookies()
         username = get_username(cookies)
         profile_name = username
-
-        header("Opening Browser")
         log(f"User: {username}")
+
         context, ctx = open_browser(username, cookies)
         try:
             page = ctx.new_page()
 
-            header("Two-Factor Authentication")
             ensure_2fa(page, username)
 
-            header("Updating Profile")
             update_profile_name(page, name)
 
-            header("Updating Billing Address")
             update_billing_address(page, first_name, last_name, address)
 
-            header("Applying for Education Benefits")
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
 
         if args.report:
-            header("Sending Report")
             if send_report(args.report, username, card_data, address, args.type):
-                log(f"Report sent to: {args.report}")
-            else:
-                log("Report could not be sent")
+                log(f"Report sent → {args.report}")
 
         cleanup_profile(profile_name)
 
-    header("Complete")
-    log("All tasks finished successfully!")
-    print()
+    print("\n  Done!\n")
 
 
 if __name__ == "__main__":
