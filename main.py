@@ -65,6 +65,10 @@ def scrape_profile_data(cookies):
         timestamp_secret = timestamp_secret_el.get_attribute("value")
         print(f"Got timestamp_secret: {timestamp_secret[:20]}...")
 
+        honeypot_el = page.query_selector('input[name^="required_field_"]')
+        honeypot_name = honeypot_el.get_attribute("name") if honeypot_el else "required_field_1b05"
+        print(f"Got honeypot field: {honeypot_name}")
+
         username = None
         form_el = page.query_selector('form[action*="/users/"]')
         if form_el:
@@ -83,6 +87,7 @@ def scrape_profile_data(cookies):
     return {
         "token": token,
         "timestamp_secret": timestamp_secret,
+        "honeypot_name": honeypot_name,
         "username": username,
     }
 
@@ -109,7 +114,7 @@ def update_github_profile(name, profile_data, cookies):
         ("user[profile_company]", ""),
         ("user[profile_location]", ""),
         ("user[profile_local_time_zone_name]", "International Date Line West"),
-        ("required_field_1b05", ""),
+        (profile_data["honeypot_name"], ""),
         ("timestamp", str(int(time.time() * 1000))),
         ("timestamp_secret", profile_data["timestamp_secret"]),
     ]
