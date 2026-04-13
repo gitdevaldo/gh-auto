@@ -18,9 +18,7 @@ def log(msg):
 
 
 def header(title):
-    print(f"\n{'='*50}")
-    print(f"  {title}")
-    print(f"{'='*50}")
+    print(f"\n--- {title} ---")
 
 
 def cleanup_profile(profile_name):

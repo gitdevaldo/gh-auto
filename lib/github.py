@@ -126,14 +126,21 @@ def _handle_login_2fa(page, login_identifier):
     verify_btn = page.locator('button[type="submit"]:has-text("Verify")')
     verify_btn.click()
 
-    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(5000)
+    page.wait_for_load_state("domcontentloaded")
     page.wait_for_timeout(3000)
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
         _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.")
 
-    _log("2FA verified")
+    if "github.com" in current_url and "login" not in current_url and "sessions" not in current_url:
+        _log("2FA verified")
+    else:
+        page.goto("https://github.com")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(2000)
+        _log("2FA verified")
 
 
 def _get_username_from_page(page):
@@ -295,15 +302,18 @@ def update_profile_name(page, name):
 
 def update_billing_address(page, first_name, last_name, address):
     page.goto(BILLING_URL)
-    page.wait_for_load_state("domcontentloaded")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(2000)
 
-    edit_btn = page.query_selector('button.js-edit-user-personal-profile')
-    if not edit_btn:
-        edit_btn = page.query_selector('button.js-add-billing-information-btn')
-    if not edit_btn:
+    edit_btn = page.locator('button.js-edit-user-personal-profile')
+    if edit_btn.count() == 0:
+        edit_btn = page.locator('button.js-add-billing-information-btn')
+    if edit_btn.count() == 0:
         _err("Billing update failed — edit button not found on the page")
 
-    edit_btn.click()
+    edit_btn.first.wait_for(state="visible", timeout=10000)
+    page.wait_for_timeout(1000)
+    edit_btn.first.click()
 
     page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=10000)
 

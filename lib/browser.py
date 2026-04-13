@@ -7,7 +7,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROFILES_DIR = os.path.join(BASE_DIR, "profiles")
 
 INDO_GEO = {"latitude": -7.781354691702329, "longitude": 112.12809680508624}
-SCREEN = Screen(max_width=1521, max_height=695)
 
 
 def get_profile_dir(username):
@@ -27,7 +26,7 @@ def open_browser(username, cookies, geolocation=None):
         geoip=True,
         humanize=True,
         os='windows',
-        screen=SCREEN,
+        screen=Screen(max_width=1521, max_height=695),
         locale="id-ID",
         geolocation=geo,
         permissions=["geolocation"],
@@ -48,7 +47,7 @@ def open_browser_fresh(profile_name, geolocation=None):
         geoip=True,
         humanize=True,
         os='windows',
-        screen=SCREEN,
+        screen=Screen(max_width=1521, max_height=695),
         locale="id-ID",
         geolocation=geo,
         permissions=["geolocation"],
