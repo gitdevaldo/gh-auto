@@ -10,6 +10,7 @@ from lib.cookies import load_cookies, get_username
 from lib.address import get_random_address, split_name
 from lib.browser import open_browser, open_browser_fresh, get_profile_dir
 from lib.github import update_profile_name, update_billing_address, apply_education, ensure_2fa, login_github
+from lib.mailer import send_report
 
 
 def log(msg):
@@ -35,6 +36,8 @@ def main():
                         help="Education application type: faculty (teacher) or student")
     parser.add_argument("--login", type=str, default=None,
                         help="Login with email/username and password: email/username password")
+    parser.add_argument("--report", type=str, default=None,
+                        help="Send success report to this email address")
     args, remaining = parser.parse_known_args()
 
     header("Preparing Data")
@@ -79,6 +82,13 @@ def main():
         finally:
             context.__exit__(None, None, None)
 
+        if args.report:
+            header("Sending Report")
+            if send_report(args.report, username, card_data, address, args.type):
+                log(f"Report sent to: {args.report}")
+            else:
+                log("Report could not be sent")
+
         cleanup_profile(profile_name)
     else:
         cookies = load_cookies()
@@ -104,6 +114,13 @@ def main():
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
+
+        if args.report:
+            header("Sending Report")
+            if send_report(args.report, username, card_data, address, args.type):
+                log(f"Report sent to: {args.report}")
+            else:
+                log("Report could not be sent")
 
         cleanup_profile(profile_name)
 
