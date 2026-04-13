@@ -31,9 +31,8 @@ def _err(msg):
 
 
 def _goto(page, url):
-    page.goto(url)
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(DELAY)
+    page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    page.wait_for_timeout(3000)
 
 
 def login_github(page, email, password):
@@ -63,7 +62,7 @@ def login_github(page, email, password):
     sign_in_btn = page.locator('input[name="commit"][value="Sign in"]')
     sign_in_btn.click()
 
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("domcontentloaded")
     page.wait_for_timeout(3000)
 
     current_url = page.url
@@ -160,7 +159,7 @@ def _get_username_from_page(page):
     if not username:
         page.wait_for_timeout(DELAY)
         page.goto("https://github.com")
-        page.wait_for_load_state("networkidle")
+        page.wait_for_load_state("domcontentloaded")
         page.wait_for_timeout(DELAY)
 
         cookies = page.context.cookies()
@@ -200,7 +199,7 @@ def _setup_2fa(page, username):
     page.wait_for_timeout(DELAY)
     enable_btn.click()
 
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("domcontentloaded")
     page.wait_for_timeout(DELAY)
 
     setup_key_btn = page.locator('span.Button-label:has-text("setup key")')
@@ -266,7 +265,7 @@ def _setup_2fa(page, username):
     continue_btn.click()
 
     page.wait_for_timeout(5000)
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("domcontentloaded")
     page.wait_for_timeout(DELAY)
 
     _log("2FA enabled")
@@ -313,7 +312,7 @@ def update_profile_name(page, name):
     submit_btn.click()
 
     page.wait_for_timeout(3000)
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("domcontentloaded")
     page.wait_for_timeout(DELAY)
 
     _log(f"Profile updated: {name}")
@@ -365,7 +364,7 @@ def update_billing_address(page, first_name, last_name, address):
     save_btn.click()
 
     page.wait_for_timeout(3000)
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("domcontentloaded")
     page.wait_for_timeout(DELAY)
 
     _log(f"Billing updated: {address['city']}, {address['state_province']}")
