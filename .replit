@@ -1,4 +1,4 @@
-modules = ["nodejs-24", "postgresql-16"]
+modules = ["nodejs-24", "postgresql-16", "python-3.12"]
 
 [deployment]
 router = "application"
@@ -26,8 +26,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node index.js"
-waitForPort = 3000
+args = "python main.py"
 
 [workflows.workflow.metadata]
 outputType = "console"
@@ -62,3 +61,9 @@ externalPort = 3000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+CARD_API_URL = "https://b00add8b-5a2b-4894-978e-68a481223c28-00-1nmhdywwds88i.pike.replit.dev/api/card/generate?type=teacher&institution=smkn1ngawi"
+GITHUB_USERNAME = "gitalexisdev"

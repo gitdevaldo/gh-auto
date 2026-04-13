@@ -1,0 +1,90 @@
+Request URL
+https://github.com/users/gitalexisdev
+Request Method
+POST
+Status Code
+302 Found
+Remote Address
+151.106.0.181:10000
+Referrer Policy
+strict-origin-when-cross-origin
+cache-control
+no-cache
+content-length
+0
+content-security-policy
+default-src 'none'; base-uri 'self'; child-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com *.rel.tunnels.api.visualstudio.com wss://*.rel.tunnels.api.visualstudio.com github.githubassets.com objects-origin.githubusercontent.com copilot-proxy.githubusercontent.com proxy.individual.githubcopilot.com proxy.business.githubcopilot.com proxy.enterprise.githubcopilot.com *.actions.githubusercontent.com wss://*.actions.githubusercontent.com productionresultssa0.blob.core.windows.net productionresultssa1.blob.core.windows.net productionresultssa2.blob.core.windows.net productionresultssa3.blob.core.windows.net productionresultssa4.blob.core.windows.net productionresultssa5.blob.core.windows.net productionresultssa6.blob.core.windows.net productionresultssa7.blob.core.windows.net productionresultssa8.blob.core.windows.net productionresultssa9.blob.core.windows.net productionresultssa10.blob.core.windows.net productionresultssa11.blob.core.windows.net productionresultssa12.blob.core.windows.net productionresultssa13.blob.core.windows.net productionresultssa14.blob.core.windows.net productionresultssa15.blob.core.windows.net productionresultssa16.blob.core.windows.net productionresultssa17.blob.core.windows.net productionresultssa18.blob.core.windows.net productionresultssa19.blob.core.windows.net github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com insights.github.com wss://alive.github.com wss://alive-staging.github.com api.githubcopilot.com api.individual.githubcopilot.com api.business.githubcopilot.com api.enterprise.githubcopilot.com; font-src github.githubassets.com; form-action 'self' github.com gist.github.com copilot-workspace.githubnext.com objects-origin.githubusercontent.com; frame-ancestors 'none'; frame-src viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src 'self' data: blob: github.githubassets.com media.githubusercontent.com camo.githubusercontent.com identicons.github.com avatars.githubusercontent.com private-avatars.githubusercontent.com github-cloud.s3.amazonaws.com objects.githubusercontent.com release-assets.githubusercontent.com secured-user-images.githubusercontent.com user-images.githubusercontent.com private-user-images.githubusercontent.com opengraph.githubassets.com marketplace-screenshots.githubusercontent.com copilotprodattachments.blob.core.windows.net/github-production-copilot-attachments/ github-production-user-asset-6210df.s3.amazonaws.com customer-stories-feed.github.com spotlights-feed.github.com objects-origin.githubusercontent.com *.githubusercontent.com; manifest-src 'self'; media-src github.com user-images.githubusercontent.com secured-user-images.githubusercontent.com private-user-images.githubusercontent.com github-production-user-asset-6210df.s3.amazonaws.com gist.github.com github.githubassets.com; script-src github.githubassets.com; style-src 'unsafe-inline' github.githubassets.com; upgrade-insecure-requests; worker-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ gist.github.com/assets-cdn/worker/
+content-type
+text/html; charset=utf-8
+date
+Mon, 13 Apr 2026 09:31:23 GMT
+location
+https://github.com/settings/profile
+referrer-policy
+origin-when-cross-origin, strict-origin-when-cross-origin
+server
+github.com
+set-cookie
+last_write_ms=1776072682949; path=/; secure; HttpOnly; SameSite=Lax
+set-cookie
+_gh_sess=2xyEk8ZPrtPKs3lYYgDh4lpo1OS6LpejvEkIkIWTDSDxeM3XIRzklAoolBdPJY3sgNft9FoS2MO4FbGxa%2FfaTvEwCsoEGVJyIHUCjb%2FquFEqAmQLM7NSjCp32Df%2BxxXmAXk%2BlwllZmjfJBsc8FZfIoTrvQiPjSxNwCcot985MaKu7pa%2Fon0m%2Bm%2BM%2B1MohvS545sNKIh7XiViwExwishUtLE%2FchheAVwgvxoRN%2BJz9PSLpYVvFXJBwDnOJgYRndR7CoYh47Dwhru5MGtN0FguI4NuNdA8n6ciFSMFXbmpqwJfay7Tr1ZLfSXFVV8RvqTAzP5AtZWDqFUe8OQSHtk4Wbny2vONaieZmlEF40maHfVvylY%2FXrwv4r2XQgts19m8lnU3Od1xMNAHUeoVsgVguHOwWCYL7sIA10t54OOJm4S3MfR1syDvBHwJPIxJbykaqMGpPzhxlVZcH65VwsCjN2ScWbz6VnhLrYYsK7OKm%2FO0r6Cy%2Bzg43MsLhCUDqBxp%2BnfmvV2KosQrSruSo3Pn5Ti06dsls1S7VRspOUN3LxKtnkYQbxGT9IdHa6lGc6pl9NGZs0SERnMhQhvZUUCop%2FltcYtVTCsaKcm7uSPQSPFWZ32wNxMeHq%2B5xq0LhTsJUdAws%2BHD1OLAblB7uR5Ywugs2La6lirhEc1TRLJABCKiRpTDFn8LS%2FTAem1gWOj1wJM6eoXzzb1mgg%2Fzts9yoIDQGmElMoBCF9YphRrk7N%2FPkC6RgE%2BANF1xccGRE5yUdrp14to65WNE80z5VX6Q3vFQasRPbyo%2FDulLzIsjrLlaQx7ggO1PPS7v%2BfA9QpFQrB1DlC9vYf5WMpD%2BZQwyreXckGQe4S8G2x8mRvkUFia9yklZFqLRKfKizbUTQgwZIHN01R%2F8UppYA%2BEONRSsvF%2BDC%2F3XmFJp4y%2FpBBGJLSudvquR1pIvzw%2F4omqBMXyK%2Fcp1K7Fo1qw%2FR45QfgdHAeUhEgjknk4wY1jo1nguphpFuuMxSTume6SdKNpx3WA6M63ur38LuqGtYp2BOcRKCjtFV1OxMbdS8%2Fqh%2BB%2FBEem1iSYeQQNKH78lz2ncdXJ1UiZseF1u02LnGpXo5lNDd8EPQZ8tl13umK%2FHurmN9b3RqTw%2Bj6tHqhf7P0eDI2BLsmRjD0puKcemPi%2F9FvEbTLgZSu1T0CBju6ht2BY00OQlxZDevHGeGJldTFgXZquMcr8grQ%3D%3D--%2FEfOQaOEhwFNfdF2--%2BcZ%2BvlVJg%2FQjKk1NuAZgKQ%3D%3D; path=/; secure; HttpOnly; SameSite=Lax
+strict-transport-security
+max-age=31536000; includeSubdomains; preload
+vary
+X-Fetch-Nonce, X-PJAX, X-PJAX-Container, Turbo-Visit, Turbo-Frame, X-Requested-With, Sec-Fetch-Site,Accept-Encoding, Accept, X-Requested-With
+x-content-type-options
+nosniff
+x-fetch-nonce
+v2:37ab9cef-967f-9b8a-d6d9-d5669ba39db5
+x-frame-options
+deny
+x-github-request-id
+E826:3607BD:188CC75:1B94E56:69DCB7EA
+x-xss-protection
+0
+:authority
+github.com
+:method
+POST
+:path
+/users/gitalexisdev
+:scheme
+https
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+cache-control
+max-age=0
+content-length
+929
+content-type
+application/x-www-form-urlencoded
+cookie
+_octo=GH1.1.213816872.1775845598; GHCC=Required:1-Analytics:1-SocialMedia:1-Advertising:1; MicrosoftApplicationsTelemetryDeviceId=34cc3b17-1cd8-4b1d-b048-133cf245db95; MSFPC=GUID=28c8d6174620437ca891da57e92aa432&HASH=28c8&LV=202604&V=4&LU=1775845652994; _device_id=3e57cde3e9a6034cb055032695c3f64c; saved_user_sessions=275156113%3AMyQlx5h9J3gpQT9bHder3st46n8u3iJ5UMTgSOVXi4Kbms0l; user_session=MyQlx5h9J3gpQT9bHder3st46n8u3iJ5UMTgSOVXi4Kbms0l; __Host-user_session_same_site=MyQlx5h9J3gpQT9bHder3st46n8u3iJ5UMTgSOVXi4Kbms0l; logged_in=yes; dotcom_user=gitalexisdev; color_mode=%7B%22color_mode%22%3A%22auto%22%2C%22light_theme%22%3A%7B%22name%22%3A%22light%22%2C%22color_mode%22%3A%22light%22%7D%2C%22dark_theme%22%3A%7B%22name%22%3A%22dark%22%2C%22color_mode%22%3A%22dark%22%7D%7D; cpu_bucket=md; preferred_color_mode=dark; tz=Asia%2FBangkok; last_write_ms=1776072178166; _gh_sess=VsrLzh5K9oSq3m6OaZdeJWVikUokOz3e3WrXi7a14HSiiuTunRDTXuIYyt12HTxoH0ZVlQfbggccGwLqtaBQD3GakYCwvrPFCldnZiKme2rPSM%2BM8qBDWPfBHWyURtOxbelPM2QqXrXapWrnFV1Nn4hQoDsiIsyqSJgUeUMughnFiCVLmq3ctKXr9uM%2FGTp4ceyIvl5HHDfsMslNk2ZScuzDazgRBIVQMeKFf1zrQiicMk3EdtES8f0zM4fnpotDxvsMeXZcVD8CPKYmTVG2m8VJXLhc2owXYSFmLdSna7UICb4%2B1iVFcieKVUH%2FaDoOEon4%2BhPNGj28Gz%2Bvp6v1AZ1EPuG%2BBYnLczVpX%2FTWrMfvxsFWPl6NxYo1WnEahxsZa6sFS%2FTuXSY96vUxF8%2FQPT6q68VJwlu1Uj%2B4Xz%2FoNz8pqKs1mREtnMGeXLHXHbAjeDVpQ1OOrGa5H5xx3ZNy%2BOGkmHbi%2FBViWlJofIQ%2BpCxbaQEIiIJM%2FemK7LWQaIokKQ5xCTI9Ecz29%2FpCSYkmNQ4AVx8t%2FCT7VS6CeKBP2Hs3PHjJiK9vTqdrDrJgbCb9m6YOBlmR12bLvKeIKjfgmV9Q6YX1pq1%2F8yY3YaNHOnL1nLyMTx5aMiQLx6UYcxnNebE%2FBPF%2BH89pRG4E5JwpVdS1ZBUJ8EwW7baVL4QkFZ3mvaNE119%2F1LNtCdQwO%2Fbqt35TjJkOhC6APWHDbwpwkMNTDyryfEbqJBHudCGOSHZzc%2B%2FSP%2FD7Hd5ulObeIoQ9IfvENmtLJLrIIU5RhJP1wP8o3oETptOLJ%2FmVZAwInmm87iVpJXNoz555PlOrmOArZ2V8Y%2F8wB6Y5y2dSAba4VKUXHSEQi%2FhttLNV%2BQC8poSD5PYhghgMJmctrAYYj3cXCytWn%2FZas1tN6j0I5wN8rt6yHObltHm7FvHQNahsP3vXiLE8wtrm07yqmtvBT964cxqoZPTWy7rXLkFojXPxiHjoBBZVEA3jbsVd5RuR6d%2Br2o1ASb7FrqHdBx1Wl0VIW%2Bfz%2FXiXIQC%2Fl4Ht7ZQwVg%3D%3D--RpLrzGTpJClItacW--F3YGdyso%2FxjLG3df4VtS8A%3D%3D
+origin
+https://github.com
+priority
+u=0, i
+referer
+https://github.com/settings/profile
+sec-ch-ua
+"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+document
+sec-fetch-mode
+navigate
+sec-fetch-site
+same-origin
+sec-fetch-user
+?1
+upgrade-insecure-requests
+1
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36
