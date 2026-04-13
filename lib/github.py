@@ -23,6 +23,11 @@ def _log(msg):
     print(f"  {msg}")
 
 
+def _err(msg):
+    print(f"\n  [ERROR] {msg}\n")
+    raise Exception(msg)
+
+
 def login_github(page, email, password):
     page.goto(LOGIN_URL)
     page.wait_for_load_state("networkidle")
@@ -59,7 +64,7 @@ def login_github(page, email, password):
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
-        _log("2FA verification required after login")
+        _log("2FA verification required")
         _handle_login_2fa(page, email)
         username = _get_username_from_page(page)
         _log(f"Logged in as: {username}")
@@ -69,8 +74,8 @@ def login_github(page, email, password):
         error_el = page.locator('.js-flash-alert, .flash-error, #js-flash-container .flash-error')
         if error_el.count() > 0:
             error_text = error_el.first.inner_text().strip()
-            raise Exception(f"Login failed: {error_text}")
-        raise Exception("Login failed: still on login page")
+            _err(f"Login failed — {error_text}")
+        _err("Login failed — incorrect email/username or password")
 
     username = _get_username_from_page(page)
     _log(f"Logged in as: {username}")
@@ -78,26 +83,28 @@ def login_github(page, email, password):
 
 
 def _find_otp_secret(login_identifier):
-    otp_dir = OTP_DIR
-    if not os.path.exists(otp_dir):
-        raise Exception(f"OTP folder not found at {otp_dir} — cannot verify 2FA. Run 2FA setup first.")
+    if not os.path.exists(OTP_DIR):
+        _err(
+            f"OTP folder not found — no 2FA secrets saved yet. "
+            f"Run the full flow first to set up 2FA for this account."
+        )
 
-    for folder_name in os.listdir(otp_dir):
-        secret_path = os.path.join(otp_dir, folder_name, "secret.txt")
+    for folder_name in os.listdir(OTP_DIR):
+        secret_path = os.path.join(OTP_DIR, folder_name, "secret.txt")
         if os.path.exists(secret_path):
             if login_identifier.lower() in folder_name.lower() or folder_name.lower() in login_identifier.lower():
                 with open(secret_path, "r") as f:
                     return f.read().strip()
 
-    exact_path = os.path.join(otp_dir, login_identifier, "secret.txt")
+    exact_path = os.path.join(OTP_DIR, login_identifier, "secret.txt")
     if os.path.exists(exact_path):
         with open(exact_path, "r") as f:
             return f.read().strip()
 
-    available = [d for d in os.listdir(otp_dir) if os.path.isdir(os.path.join(otp_dir, d))]
-    raise Exception(
+    available = [d for d in os.listdir(OTP_DIR) if os.path.isdir(os.path.join(OTP_DIR, d))]
+    _err(
         f"No OTP secret found for '{login_identifier}'. "
-        f"Available OTP folders: {available}. "
+        f"Available accounts: {available if available else 'none'}. "
         f"Run the full flow first to set up 2FA and save the secret."
     )
 
@@ -118,14 +125,15 @@ def _handle_login_2fa(page, login_identifier):
 
     verify_btn = page.locator('button[type="submit"]:has-text("Verify")')
     verify_btn.click()
-    _log("OTP verified")
 
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(3000)
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
-        raise Exception("2FA verification failed — still on verification page")
+        _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.")
+
+    _log("2FA verified")
 
 
 def _get_username_from_page(page):
@@ -142,7 +150,7 @@ def _get_username_from_page(page):
             username = meta.get_attribute("content")
 
     if not username:
-        raise Exception("Could not determine username")
+        _err("Could not determine username — no 'dotcom_user' cookie or user meta tag found")
 
     return username
 
@@ -187,7 +195,7 @@ def _setup_2fa(page, username):
     secret_path = os.path.join(user_otp_dir, "secret.txt")
     with open(secret_path, "w") as f:
         f.write(secret)
-    _log(f"TOTP secret saved to {secret_path}")
+    _log(f"TOTP secret saved → {secret_path}")
 
     page.wait_for_timeout(1000)
 
@@ -203,7 +211,7 @@ def _setup_2fa(page, username):
     page.wait_for_timeout(1000)
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
-    _log("OTP code entered — waiting for verification...")
+    _log("OTP entered — verifying...")
 
     page.wait_for_timeout(3000)
 
@@ -215,19 +223,18 @@ def _setup_2fa(page, username):
     recovery_codes_text = _scrape_recovery_codes(page)
     page.wait_for_timeout(1000)
 
+    recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
     try:
         with page.expect_download(timeout=10000) as download_info:
             download_btn.click()
         download = download_info.value
         page.wait_for_timeout(2000)
-        recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
         download.save_as(recovery_path)
     except Exception:
-        recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
         with open(recovery_path, "w") as f:
             f.write(recovery_codes_text)
 
-    _log(f"Recovery codes saved to {recovery_path}")
+    _log(f"Recovery codes saved → {recovery_path}")
 
     page.wait_for_timeout(1500)
 
@@ -267,7 +274,7 @@ def update_profile_name(page, name):
 
     name_input = page.query_selector('input[name="user[profile_name]"]')
     if not name_input:
-        raise Exception("Could not find name input on the page")
+        _err("Profile update failed — name input field not found on the page")
 
     name_input.fill("")
     name_input.type(name)
@@ -276,7 +283,7 @@ def update_profile_name(page, name):
     if not submit_btn:
         submit_btn = page.query_selector('button[type="submit"]')
     if not submit_btn:
-        raise Exception("Could not find submit button on the page")
+        _err("Profile update failed — submit button not found on the page")
 
     page.wait_for_timeout(500)
 
@@ -294,7 +301,7 @@ def update_billing_address(page, first_name, last_name, address):
     if not edit_btn:
         edit_btn = page.query_selector('button.js-add-billing-information-btn')
     if not edit_btn:
-        raise Exception("Could not find Edit billing button on the page")
+        _err("Billing update failed — edit button not found on the page")
 
     edit_btn.click()
 
@@ -325,7 +332,7 @@ def update_billing_address(page, first_name, last_name, address):
     if not save_btn:
         save_btn = page.query_selector('button[type="submit"].Button--primary')
     if not save_btn:
-        raise Exception("Could not find Save billing button")
+        _err("Billing update failed — save button not found on the page")
 
     save_btn.click()
 
@@ -376,9 +383,9 @@ def apply_education(page, card_data, app_type="faculty"):
     image_b64 = card_data.get("imageBase64", "")
 
     if not school_name:
-        raise Exception("Card API did not return school_name")
+        _err("Education application failed — card data missing 'schoolName'")
     if not image_b64:
-        raise Exception("Card API did not return image")
+        _err("Education application failed — card data missing 'imageBase64'")
 
     photo_proof_json = _build_photo_proof(image_b64)
 
@@ -443,7 +450,7 @@ def apply_education(page, card_data, app_type="faculty"):
 
     input_val = school_input.input_value()
     if not input_val.strip():
-        raise Exception("School selection failed — input is empty after clicking option")
+        _err("Education application failed — school selection didn't register, input is empty")
 
     share_btn = page.query_selector('button:has-text("Share Location")')
     if share_btn and share_btn.is_visible():
@@ -457,11 +464,11 @@ def apply_education(page, card_data, app_type="faculty"):
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
 
     if continue_btn.is_disabled():
-        raise Exception("Continue button is disabled. Step 1 requirements not met.")
+        _err("Education application failed — continue button is disabled, step 1 requirements not met")
 
     page.wait_for_timeout(1000)
     continue_btn.click()
-    _log("Step 1 completed — continuing...")
+    _log("Step 1 completed")
 
     page.wait_for_timeout(5000)
 
@@ -480,17 +487,17 @@ def apply_education(page, card_data, app_type="faculty"):
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
     if submit_btn.is_disabled():
-        raise Exception("Submit button is disabled. Step 2 requirements not met.")
+        _err("Education application failed — submit button is disabled, step 2 requirements not met")
 
     page.wait_for_timeout(1000)
     submit_btn.click()
-    _log("Step 2 completed — submitting...")
+    _log("Step 2 completed")
 
     page.wait_for_timeout(5000)
 
     location_mismatch = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
     if location_mismatch and location_mismatch.is_visible():
-        _log("Location mismatch detected — handling step 3...")
+        _log("Location mismatch — handling step 3...")
 
         page.wait_for_timeout(1000)
         distance_radio = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
@@ -507,11 +514,11 @@ def apply_education(page, card_data, app_type="faculty"):
         final_submit = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
         if final_submit.is_disabled():
-            raise Exception("Final submit button is disabled. Step 3 requirements not met.")
+            _err("Education application failed — submit button is disabled, step 3 requirements not met")
 
         page.wait_for_timeout(1000)
         final_submit.click()
-        _log("Step 3 completed — final submission...")
+        _log("Step 3 completed")
 
         page.wait_for_timeout(5000)
 
