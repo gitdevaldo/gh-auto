@@ -52,15 +52,24 @@ Without these, camoufox fails with: `libgtk-3.so.0: cannot open shared object fi
 
 ## Environment Variables
 
-- `CARD_API_URL` — API endpoint to generate card data (returns JSON with `name` field)
+- `CARD_API_URL` — API endpoint to generate card data (returns JSON with `name`, `school_name`, `image` fields)
 
 ## Automation Flow
 
-1. Fetch a random name from card API
-2. Open camoufox browser with persistent profile
+1. Fetch card data from API (name, school name, ID card image)
+2. Open camoufox browser with persistent profile, spoofed Indonesian geolocation
 3. Navigate to profile settings, fill name, submit form
 4. Fetch random Indonesian address from mocloc.com API
 5. Navigate to billing page, click Edit, fill address form, save
+6. Navigate to education benefits page, apply for GitHub Education:
+   - Click "Start an application"
+   - Select role (teacher/student via `--type` argument)
+   - Search and select school from dropdown
+   - Share spoofed location (geolocation pre-granted)
+   - Click Continue
+   - If student: select proof type "ID Card"
+   - Submit — route interceptor replaces `photo_proof` with camera-faked JSON blob mid-flight
+   - Verify success banner
 
 ## Cookie Setup
 
@@ -76,7 +85,9 @@ Browser profiles are stored in `profiles/{username}/`. On first run for a userna
 ## How to Run
 
 ```
-python main.py
+python main.py                  # default: teacher application
+python main.py --type faculty   # teacher application
+python main.py --type student   # student application
 ```
 
 ## Key Design Decisions

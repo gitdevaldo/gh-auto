@@ -4,10 +4,14 @@ import requests
 CARD_API_URL = os.getenv("CARD_API_URL")
 
 
-def get_card_name():
+def get_card_data():
     resp = requests.get(CARD_API_URL)
     resp.raise_for_status()
     data = resp.json()
-    name = data["name"]
-    print(f"Got name from card API: {name}")
-    return name
+    print(f"Got card data: name={data.get('name')}, school={data.get('school_name')}")
+    return data
+
+
+def get_card_name():
+    data = get_card_data()
+    return data["name"]
