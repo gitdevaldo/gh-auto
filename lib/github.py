@@ -66,13 +66,23 @@ def _setup_2fa(page, username):
 
     page.wait_for_timeout(1000)
 
-    x_icon = page.locator('svg.octicon-x')
-    if x_icon.count() > 0:
-        x_icon.first.click()
-        print("Closed setup key popup via X icon")
-    else:
-        page.keyboard.press("Escape")
-        print("Pressed Escape to close popup")
+    closed = False
+    close_btn = page.locator('button:visible:has(svg.octicon-x)')
+    if close_btn.count() > 0:
+        try:
+            close_btn.first.click(timeout=3000)
+            closed = True
+            print("Closed setup key popup via close button")
+        except Exception:
+            pass
+
+    if not closed:
+        try:
+            page.mouse.click(10, 10)
+            print("Clicked outside popup to dismiss it")
+        except Exception:
+            page.keyboard.press("Escape")
+            print("Pressed Escape to close popup")
 
     page.wait_for_timeout(1500)
 
