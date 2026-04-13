@@ -322,20 +322,13 @@ def update_profile_name(page, name):
 def update_billing_address(page, first_name, last_name, address):
     _goto(page, BILLING_URL)
 
-    page.evaluate("""() => {
-        const btn = document.querySelector('button.js-edit-user-personal-profile') 
-                 || document.querySelector('button.js-add-billing-information-btn');
-        if (btn) btn.click();
-    }""")
-    page.wait_for_timeout(DELAY)
+    form_already_visible = page.locator('#billing_contact_first_name').is_visible()
 
-    form_visible = page.locator('#billing_contact_first_name').is_visible()
-    if not form_visible:
-        page.evaluate("""() => {
-            const form = document.querySelector('.js-personal-billing-info-form, .js-billing-information-form, form[action*="billing"]');
-            if (form) { form.hidden = false; form.style.display = 'block'; }
-        }""")
-        page.wait_for_timeout(DELAY)
+    if not form_already_visible:
+        edit_btn = page.locator('button.js-edit-user-personal-profile')
+        if edit_btn.count() > 0:
+            edit_btn.first.evaluate("btn => btn.click()")
+            page.wait_for_timeout(DELAY)
 
     page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=15000)
     page.wait_for_timeout(DELAY)
