@@ -20,7 +20,7 @@ def open_browser(username, cookies, geolocation=None, headless=False):
     profile_dir = get_profile_dir(username)
     geo = geolocation or INDO_GEO
     context = Camoufox(
-        headless="virtual" if headless else False,
+        headless=headless,
         persistent_context=True,
         user_data_dir=profile_dir,
         geoip=True,
@@ -41,7 +41,7 @@ def open_browser_fresh(profile_name, geolocation=None, headless=False):
     profile_dir = get_profile_dir(profile_name)
     geo = geolocation or INDO_GEO
     context = Camoufox(
-        headless="virtual" if headless else False,
+        headless=headless,
         persistent_context=True,
         user_data_dir=profile_dir,
         geoip=True,
