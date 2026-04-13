@@ -16,7 +16,7 @@ def get_profile_dir(profile_name):
     return profile_path
 
 
-def open_browser(profile_name, cookies=None, geolocation=None, headless=False):
+def open_browser(profile_name, cookies=None, geolocation=None, headless=True):
     profile_dir = get_profile_dir(profile_name)
     geo = geolocation or INDO_GEO
     context = Camoufox(

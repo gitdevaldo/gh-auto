@@ -36,8 +36,6 @@ def main():
                         help="Login with email/username and password: email/username password")
     parser.add_argument("--report", type=str, default=None,
                         help="Send success report to this email address")
-    parser.add_argument("--headless", action="store_true", default=False,
-                        help="Run browser in headless mode")
     args, remaining = parser.parse_known_args()
 
     header("Preparing")
@@ -60,7 +58,7 @@ def main():
         profile_name = email
 
         header("Login")
-        context, ctx = open_browser(profile_name, headless=args.headless)
+        context, ctx = open_browser(profile_name)
         try:
             page = ctx.new_page()
 
@@ -89,7 +87,7 @@ def main():
         log(f"User: {username}")
 
         header("Setup")
-        context, ctx = open_browser(username, cookies=cookies, headless=args.headless)
+        context, ctx = open_browser(username, cookies=cookies)
         try:
             page = ctx.new_page()
 
