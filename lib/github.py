@@ -39,7 +39,6 @@ def login_github(page, email, password):
         return _get_username_from_page(page)
 
     if "sessions/two-factor" in current_url:
-        _log("2FA verification required — session resuming")
         _handle_login_2fa(page, email)
         username = _get_username_from_page(page)
         _log(f"Logged in as: {username}")
@@ -64,7 +63,6 @@ def login_github(page, email, password):
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
-        _log("2FA verification required")
         _handle_login_2fa(page, email)
         username = _get_username_from_page(page)
         _log(f"Logged in as: {username}")
@@ -134,13 +132,10 @@ def _handle_login_2fa(page, login_identifier):
     if "sessions/two-factor" in current_url:
         _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.")
 
-    if "github.com" in current_url and "login" not in current_url and "sessions" not in current_url:
-        _log("2FA verified")
-    else:
+    if "github.com" not in current_url or "login" in current_url or "sessions" in current_url:
         page.goto("https://github.com")
         page.wait_for_load_state("networkidle")
         page.wait_for_timeout(2000)
-        _log("2FA verified")
 
 
 def _get_username_from_page(page):
@@ -169,10 +164,8 @@ def ensure_2fa(page, username):
 
     not_enabled = page.query_selector('h2.blankslate-heading')
     if not_enabled and "not enabled yet" in not_enabled.inner_text().strip().lower():
-        _log("2FA not enabled — setting up...")
         return _setup_2fa(page, username)
     else:
-        _log("2FA already enabled — skipping")
         return None
 
 
@@ -202,7 +195,7 @@ def _setup_2fa(page, username):
     secret_path = os.path.join(user_otp_dir, "secret.txt")
     with open(secret_path, "w") as f:
         f.write(secret)
-    _log(f"TOTP secret saved → {secret_path}")
+    _log(f"TOTP secret saved")
 
     page.wait_for_timeout(1000)
 
@@ -218,7 +211,6 @@ def _setup_2fa(page, username):
     page.wait_for_timeout(1000)
     otp_input.fill("")
     otp_input.type(otp_code, delay=100)
-    _log("OTP entered — verifying...")
 
     page.wait_for_timeout(3000)
 
@@ -241,7 +233,7 @@ def _setup_2fa(page, username):
         with open(recovery_path, "w") as f:
             f.write(recovery_codes_text)
 
-    _log(f"Recovery codes saved → {recovery_path}")
+    _log("Recovery codes saved")
 
     page.wait_for_timeout(1500)
 
@@ -252,7 +244,7 @@ def _setup_2fa(page, username):
 
     page.wait_for_timeout(5000)
 
-    _log("2FA enabled successfully")
+    _log("2FA enabled")
     return secret
 
 
@@ -297,7 +289,7 @@ def update_profile_name(page, name):
     with page.expect_navigation(wait_until="domcontentloaded", timeout=15000):
         submit_btn.click()
 
-    _log(f"Profile name set to: {name}")
+    _log(f"Profile updated: {name}")
 
 
 def update_billing_address(page, first_name, last_name, address):
@@ -348,7 +340,7 @@ def update_billing_address(page, first_name, last_name, address):
 
     page.wait_for_timeout(2000)
 
-    _log(f"Billing address updated — {address['city']}, {address['state_province']}")
+    _log(f"Billing updated: {address['city']}, {address['state_province']}")
 
 
 def _build_photo_proof(image_b64):
@@ -419,7 +411,6 @@ def apply_education(page, card_data, app_type="faculty"):
     radio = page.wait_for_selector(radio_id, state="visible", timeout=10000)
     page.wait_for_timeout(1000)
     radio.click()
-    _log(f"Application type: {app_type}")
 
     page.wait_for_timeout(1500)
 
@@ -454,7 +445,6 @@ def apply_education(page, card_data, app_type="faculty"):
 
     selected_name = best_match.get_attribute('data-school-name') or best_match.inner_text().strip()
     best_match.click()
-    _log(f"School selected: {selected_name}")
 
     page.wait_for_timeout(2000)
 
@@ -466,7 +456,6 @@ def apply_education(page, card_data, app_type="faculty"):
     if share_btn and share_btn.is_visible():
         page.wait_for_timeout(1000)
         share_btn.click()
-        _log("Location shared")
         page.wait_for_timeout(3000)
 
     page.wait_for_timeout(1000)
@@ -478,7 +467,6 @@ def apply_education(page, card_data, app_type="faculty"):
 
     page.wait_for_timeout(1000)
     continue_btn.click()
-    _log("Step 1 completed")
 
     page.wait_for_timeout(5000)
 
@@ -490,7 +478,6 @@ def apply_education(page, card_data, app_type="faculty"):
         page.wait_for_timeout(1000)
         id_card_option = page.wait_for_selector('[role="option"]:has-text("ID")', state="visible", timeout=10000)
         id_card_option.click()
-        _log("Proof type: ID Card")
 
         page.wait_for_timeout(1500)
 
@@ -501,13 +488,11 @@ def apply_education(page, card_data, app_type="faculty"):
 
     page.wait_for_timeout(1000)
     submit_btn.click()
-    _log("Step 2 completed")
 
     page.wait_for_timeout(5000)
 
     location_mismatch = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
     if location_mismatch and location_mismatch.is_visible():
-        _log("Location mismatch — handling step 3...")
 
         page.wait_for_timeout(1000)
         distance_radio = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
@@ -528,12 +513,11 @@ def apply_education(page, card_data, app_type="faculty"):
 
         page.wait_for_timeout(1000)
         final_submit.click()
-        _log("Step 3 completed")
 
         page.wait_for_timeout(5000)
 
     banner = page.query_selector('.Banner-message .Banner-title')
     if banner and "Your application has been submitted" in banner.inner_text().strip():
-        _log("Application submitted successfully!")
+        _log("Application submitted")
     else:
-        _log(f"Application status unclear — check: {page.url}")
+        _log(f"Application status unclear — {page.url}")
