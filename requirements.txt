@@ -1,4 +1,5 @@
 camoufox[geoip]==0.4.11
+browserforge
 requests==2.33.1
 python-dotenv==1.2.2
 pyotp==2.9.0
@@ -7,3 +8,4 @@ pyotp==2.9.0
 # gtk3, glib, dbus-glib, alsa-lib, xorg.libXrender, xorg.libXt
 # Required for camoufox headless Firefox to run without a display.
 # Without gtk3: "libgtk-3.so.0: cannot open shared object file" error.
+browserforge
