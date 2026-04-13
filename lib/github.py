@@ -80,42 +80,45 @@ def _setup_2fa(page, username):
 
     page.wait_for_timeout(5000)
 
-    recovery_heading = page.wait_for_selector('h2.wizard-step-title:has-text("Download your recovery codes")', state="visible", timeout=15000)
-    print("Recovery codes step appeared")
-
-    page.wait_for_timeout(2000)
-
-    download_btn = page.query_selector('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
-    if not download_btn:
-        download_btn = page.query_selector('button:has-text("Download")')
-    if not download_btn:
-        raise Exception("Could not find Download recovery codes button")
-
-    with page.expect_download() as download_info:
-        download_btn.click()
-        print("Clicked 'Download' recovery codes")
-
-    download = download_info.value
-    page.wait_for_timeout(2000)
-
     user_otp_dir = os.path.join(OTP_DIR, username)
     os.makedirs(user_otp_dir, exist_ok=True)
-
-    recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
-    download.save_as(recovery_path)
-    print(f"Saved recovery codes to {recovery_path}")
 
     secret_path = os.path.join(user_otp_dir, "secret.txt")
     with open(secret_path, "w") as f:
         f.write(secret)
     print(f"Saved TOTP secret to {secret_path}")
 
+    page.locator('h2.wizard-step-title:has-text("Download your recovery codes")').first.wait_for(state="visible", timeout=15000)
+    print("Recovery codes step appeared")
+
+    page.wait_for_timeout(2000)
+
+    download_btn = page.query_selector('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
+    if not download_btn:
+        download_btn = page.locator('button:has-text("Download")').first
+    if not download_btn:
+        raise Exception("Could not find Download recovery codes button")
+
+    with page.expect_download() as download_info:
+        if hasattr(download_btn, 'click'):
+            download_btn.click()
+        else:
+            download_btn.click()
+        print("Clicked 'Download' recovery codes")
+
+    download = download_info.value
+    page.wait_for_timeout(2000)
+
+    recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
+    download.save_as(recovery_path)
+    print(f"Saved recovery codes to {recovery_path}")
+
     page.wait_for_timeout(1500)
 
-    continue_btn = page.query_selector('button:has-text("I have saved my recovery codes")')
-    if not continue_btn:
-        continue_btn = page.query_selector('button[data-action="click:single-page-wizard-step#onNext"]')
-    if not continue_btn:
+    continue_btn = page.locator('button:has-text("I have saved my recovery codes")').first
+    if not continue_btn.is_visible():
+        continue_btn = page.locator('button[data-action="click:single-page-wizard-step#onNext"]').first
+    if not continue_btn.is_visible():
         raise Exception("Could not find 'I have saved my recovery codes' button")
 
     page.wait_for_timeout(1000)
@@ -124,11 +127,7 @@ def _setup_2fa(page, username):
 
     page.wait_for_timeout(5000)
 
-    success_heading = page.query_selector('h1')
-    if success_heading and "2FA" in success_heading.inner_text() and "enabled" in success_heading.inner_text().lower():
-        print("SUCCESS: Two-factor authentication is now enabled!")
-    else:
-        print("2FA setup completed — verifying status...")
+    print(f"2FA setup completed. Files saved to {user_otp_dir}")
 
     return secret
 
