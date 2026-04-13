@@ -82,18 +82,15 @@ def _setup_2fa(page, username):
     otp_input.type(otp_code, delay=100)
     print(f"Entered OTP code: {otp_code}")
 
-    page.wait_for_timeout(5000)
+    page.wait_for_timeout(3000)
 
-    recovery_heading = page.locator('h2.wizard-step-title.f3:has-text("Download your recovery codes")')
-    recovery_heading.first.wait_for(state="visible", timeout=20000)
-    print("Recovery codes step appeared")
+    download_btn = page.locator('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
+    download_btn.wait_for(state="visible", timeout=30000)
+    print("Recovery codes step appeared — download button visible")
 
     page.wait_for_timeout(2000)
 
     recovery_codes_text = _scrape_recovery_codes(page)
-
-    download_btn = page.locator('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
-    download_btn.wait_for(state="visible", timeout=10000)
     page.wait_for_timeout(1000)
 
     try:
