@@ -29,9 +29,16 @@ def login_github(page, email, password):
     page.wait_for_timeout(2000)
 
     current_url = page.url
-    if "github.com/login" not in current_url:
+    if "github.com/login" not in current_url and "sessions/two-factor" not in current_url:
         _log("Already logged in — login skipped")
         return _get_username_from_page(page)
+
+    if "sessions/two-factor" in current_url:
+        _log("2FA verification required — session resuming")
+        _handle_login_2fa(page, email)
+        username = _get_username_from_page(page)
+        _log(f"Logged in as: {username}")
+        return username
 
     login_field = page.locator('input#login_field')
     login_field.wait_for(state="visible", timeout=10000)
@@ -51,6 +58,13 @@ def login_github(page, email, password):
     page.wait_for_timeout(3000)
 
     current_url = page.url
+    if "sessions/two-factor" in current_url:
+        _log("2FA verification required after login")
+        _handle_login_2fa(page, email)
+        username = _get_username_from_page(page)
+        _log(f"Logged in as: {username}")
+        return username
+
     if "github.com/login" in current_url:
         error_el = page.locator('.js-flash-alert, .flash-error, #js-flash-container .flash-error')
         if error_el.count() > 0:
@@ -61,6 +75,57 @@ def login_github(page, email, password):
     username = _get_username_from_page(page)
     _log(f"Logged in as: {username}")
     return username
+
+
+def _find_otp_secret(login_identifier):
+    otp_dir = OTP_DIR
+    if not os.path.exists(otp_dir):
+        raise Exception(f"OTP folder not found at {otp_dir} — cannot verify 2FA. Run 2FA setup first.")
+
+    for folder_name in os.listdir(otp_dir):
+        secret_path = os.path.join(otp_dir, folder_name, "secret.txt")
+        if os.path.exists(secret_path):
+            if login_identifier.lower() in folder_name.lower() or folder_name.lower() in login_identifier.lower():
+                with open(secret_path, "r") as f:
+                    return f.read().strip()
+
+    exact_path = os.path.join(otp_dir, login_identifier, "secret.txt")
+    if os.path.exists(exact_path):
+        with open(exact_path, "r") as f:
+            return f.read().strip()
+
+    available = [d for d in os.listdir(otp_dir) if os.path.isdir(os.path.join(otp_dir, d))]
+    raise Exception(
+        f"No OTP secret found for '{login_identifier}'. "
+        f"Available OTP folders: {available}. "
+        f"Run the full flow first to set up 2FA and save the secret."
+    )
+
+
+def _handle_login_2fa(page, login_identifier):
+    secret = _find_otp_secret(login_identifier)
+
+    totp = pyotp.TOTP(secret)
+    otp_code = totp.now()
+
+    otp_input = page.locator('input#app_totp')
+    otp_input.wait_for(state="visible", timeout=10000)
+    page.wait_for_timeout(1000)
+    otp_input.fill("")
+    otp_input.type(otp_code, delay=100)
+
+    page.wait_for_timeout(1000)
+
+    verify_btn = page.locator('button[type="submit"]:has-text("Verify")')
+    verify_btn.click()
+    _log("OTP verified")
+
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(3000)
+
+    current_url = page.url
+    if "sessions/two-factor" in current_url:
+        raise Exception("2FA verification failed — still on verification page")
 
 
 def _get_username_from_page(page):
