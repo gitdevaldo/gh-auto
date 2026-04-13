@@ -36,3 +36,21 @@ def open_browser(username, cookies, geolocation=None):
     ctx.add_cookies(format_cookies(cookies))
     print("Loaded fresh cookies into browser context")
     return context, ctx
+
+
+def open_browser_fresh(profile_name, geolocation=None):
+    profile_dir = get_profile_dir(profile_name)
+    geo = geolocation or INDO_GEO
+    context = Camoufox(
+        headless=False,
+        persistent_context=True,
+        user_data_dir=profile_dir,
+        geoip=True,
+        locale="id-ID",
+        geolocation=geo,
+        permissions=["geolocation"],
+    )
+    ctx = context.__enter__()
+    ctx.clear_cookies()
+    print("Cleared old cookies from persistent profile")
+    return context, ctx

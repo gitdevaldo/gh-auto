@@ -8,6 +8,7 @@ import pyotp
 
 from lib.browser import open_browser
 
+LOGIN_URL = "https://github.com/login"
 PROFILE_URL = "https://github.com/settings/profile"
 BILLING_URL = "https://github.com/settings/billing/payment_information"
 EDUCATION_URL = "https://github.com/settings/education/benefits"
@@ -16,6 +17,61 @@ TWO_FA_SETUP_URL = "https://github.com/settings/two_factor_authentication/setup/
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OTP_DIR = os.path.join(BASE_DIR, "otp")
+
+
+def login_github(page, email, password):
+    page.goto(LOGIN_URL)
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(2000)
+    print("Navigated to GitHub login page")
+
+    login_field = page.locator('input#login_field')
+    login_field.wait_for(state="visible", timeout=10000)
+    page.wait_for_timeout(500)
+    login_field.fill(email)
+    print(f"Entered email/username: {email}")
+
+    password_field = page.locator('input#password')
+    page.wait_for_timeout(500)
+    password_field.fill(password)
+    print("Entered password")
+
+    page.wait_for_timeout(1000)
+
+    sign_in_btn = page.locator('input[name="commit"][value="Sign in"]')
+    sign_in_btn.click()
+    print("Clicked 'Sign in'")
+
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(3000)
+
+    current_url = page.url
+    if "github.com/login" in current_url:
+        error_el = page.locator('.js-flash-alert, .flash-error, #js-flash-container .flash-error')
+        if error_el.count() > 0:
+            error_text = error_el.first.inner_text().strip()
+            raise Exception(f"Login failed: {error_text}")
+        raise Exception("Login failed: still on login page")
+
+    print(f"Login successful — redirected to {current_url}")
+
+    username = None
+    cookies = page.context.cookies()
+    for cookie in cookies:
+        if cookie["name"] == "dotcom_user":
+            username = cookie["value"]
+            break
+
+    if not username:
+        meta = page.locator('meta[name="user-login"]')
+        if meta.count() > 0:
+            username = meta.get_attribute("content")
+
+    if not username:
+        raise Exception("Login succeeded but could not determine username")
+
+    print(f"Logged in as: {username}")
+    return username
 
 
 def ensure_2fa(page, username):
