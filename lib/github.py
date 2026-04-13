@@ -228,22 +228,7 @@ def apply_education(page, card_data, app_type="faculty"):
     share_btn = page.query_selector('button:has-text("Share Location")')
     if share_btn and share_btn.is_visible():
         share_btn.click()
-        print("Clicked 'Share Location'")
-
-        for i in range(20):
-            page.wait_for_timeout(500)
-            still_visible = page.query_selector('button:has-text("Share Location")')
-            if not still_visible or not still_visible.is_visible():
-                print("  Location shared successfully (button disappeared)")
-                break
-            location_result = page.query_selector('.js-location-result, .location-check-result, [data-location-detected]')
-            if location_result:
-                print(f"  Location result appeared: '{location_result.inner_text().strip()[:60]}'")
-                break
-        else:
-            print("  WARNING: Share Location button still visible after waiting — location may not have been accepted")
-            page.screenshot(path="debug_share_location.png")
-
+        print("Clicked 'Share Location' — geolocation already granted via context")
         page.wait_for_timeout(2000)
     else:
         print("  'Share Location' button not found or not visible, skipping")
@@ -253,21 +238,12 @@ def apply_education(page, card_data, app_type="faculty"):
     print(f"  Continue button text: '{btn_text}'")
 
     if continue_btn.is_disabled():
-        page.screenshot(path="debug_step1_disabled.png")
         raise Exception("Continue button is disabled. Step 1 requirements not met.")
 
     continue_btn.click()
     print("Clicked 'Continue'")
 
     page.wait_for_timeout(3000)
-
-    submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
-    new_btn_text = submit_btn.inner_text().strip()
-    print(f"  Button text after Continue: '{new_btn_text}'")
-
-    if "continue" in new_btn_text.lower():
-        page.screenshot(path="debug_step_not_advanced.png")
-        raise Exception("Step did not advance — still showing 'Continue'. Check if school/location was accepted.")
 
     if app_type == "student":
         proof_btn = page.wait_for_selector('button:has-text("Select...")', state="visible", timeout=10000)
@@ -280,8 +256,11 @@ def apply_education(page, card_data, app_type="faculty"):
 
         page.wait_for_timeout(500)
 
+    submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
+    submit_text = submit_btn.inner_text().strip()
+    print(f"  Submit button text: '{submit_text}'")
+
     if submit_btn.is_disabled():
-        page.screenshot(path="debug_step2_disabled.png")
         raise Exception("Submit button is disabled. Step 2 requirements not met.")
 
     submit_btn.click()
@@ -290,5 +269,3 @@ def apply_education(page, card_data, app_type="faculty"):
     page.wait_for_timeout(5000)
 
     print(f"Current URL after submit: {page.url}")
-    page.screenshot(path="debug_final_state.png")
-    print("Saved screenshot of final state to debug_final_state.png")
