@@ -82,6 +82,9 @@ def scrape_profile_data(cookies):
             raise Exception("Could not determine GitHub username from page")
         print(f"Got username: {username}")
 
+        session_cookies = context.cookies("https://github.com")
+        print(f"Got {len(session_cookies)} session cookies")
+
         context.close()
 
     return {
@@ -89,11 +92,12 @@ def scrape_profile_data(cookies):
         "timestamp_secret": timestamp_secret,
         "honeypot_name": honeypot_name,
         "username": username,
+        "session_cookies": session_cookies,
     }
 
 
-def update_github_profile(name, profile_data, cookies):
-    cookie_str = "; ".join(f"{c['name']}={c['value']}" for c in cookies)
+def update_github_profile(name, profile_data):
+    cookie_str = "; ".join(f"{c['name']}={c['value']}" for c in profile_data["session_cookies"])
 
     payload = [
         ("_method", "put"),
@@ -154,7 +158,7 @@ def main():
     name = get_card_name()
     cookies = load_cookies()
     profile_data = scrape_profile_data(cookies)
-    update_github_profile(name, profile_data, cookies)
+    update_github_profile(name, profile_data)
 
 
 if __name__ == "__main__":
