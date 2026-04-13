@@ -145,22 +145,25 @@ def _make_intercept_handler(photo_proof_json):
     return handle
 
 
-def _has_session_banner(page):
-    session_banner = page.query_selector('.flash-error, .flash-warn')
-    if session_banner:
-        text = session_banner.inner_text().strip().lower()
-        if "signed in with another tab" in text or "signed out" in text or "switched accounts" in text:
-            return True
-    return False
+SESSION_KEYWORDS = ["signed in with another tab", "signed out in another tab", "switched accounts on another tab"]
+
+
+def _find_session_banner(page):
+    for el in page.query_selector_all('.flash-error, .flash-warn, .flash'):
+        text = el.inner_text().strip().lower()
+        for keyword in SESSION_KEYWORDS:
+            if keyword in text:
+                return el
+    return None
 
 
 def _dismiss_session_banner(page, navigate_url=None):
-    if not _has_session_banner(page):
+    banner = _find_session_banner(page)
+    if not banner:
         return False
-    session_banner = page.query_selector('.flash-error, .flash-warn')
-    text = session_banner.inner_text().strip()
+    text = banner.inner_text().strip()
     print(f"  Session banner detected: '{text[:80]}...'")
-    dismiss_btn = session_banner.query_selector('button, [aria-label="Dismiss"]')
+    dismiss_btn = banner.query_selector('button, [aria-label="Dismiss"]')
     if dismiss_btn:
         dismiss_btn.click()
         page.wait_for_timeout(500)
@@ -196,15 +199,17 @@ def _wait_for_step_change(page, previous_step, description, timeout=15000):
     import time
     deadline = time.time() + timeout / 1000
     while time.time() < deadline:
-        error_el = page.query_selector('.flash-error, .flash-warn, .Banner--error')
+        if _find_session_banner(page):
+            print(f"  Session banner appeared during step transition — dismissing")
+            _dismiss_session_banner(page, navigate_url=EDUCATION_URL)
+            continue
+
+        error_el = page.query_selector('.flash-error, .Banner--error')
         if error_el:
             err_text = error_el.inner_text().strip()
-            if "signed in with another tab" in err_text.lower() or "signed out" in err_text.lower() or "switched accounts" in err_text.lower():
-                print(f"  Session banner appeared during step transition — dismissing")
-                _dismiss_session_banner(page, navigate_url=EDUCATION_URL)
-                continue
-            page.screenshot(path="debug_step_error.png")
-            raise Exception(f"Step transition failed ({description}): {err_text}")
+            if err_text:
+                page.screenshot(path="debug_step_error.png")
+                raise Exception(f"Step transition failed ({description}): {err_text}")
 
         current = _get_step_indicator(page)
         if current and current != previous_step:
@@ -240,7 +245,7 @@ def apply_education(page, card_data, app_type="faculty"):
     print("Navigated to education benefits page")
 
     if _dismiss_session_banner(page, navigate_url=EDUCATION_URL):
-        if _has_session_banner(page):
+        if _find_session_banner(page):
             page.screenshot(path="debug_session_banner_persist.png")
             raise Exception("Session banner persists after reload — cookies may be expired")
 
