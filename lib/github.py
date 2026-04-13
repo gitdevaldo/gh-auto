@@ -145,19 +145,34 @@ def _make_intercept_handler(photo_proof_json):
     return handle
 
 
-def _dismiss_session_banner(page):
+def _has_session_banner(page):
     session_banner = page.query_selector('.flash-error, .flash-warn')
     if session_banner:
-        text = session_banner.inner_text().strip()
-        if "signed in with another tab" in text.lower() or "signed out" in text.lower() or "switched accounts" in text.lower():
-            print(f"  Session banner detected: '{text[:80]}...' — reloading page")
-            dismiss_btn = session_banner.query_selector('button, [aria-label="Dismiss"]')
-            if dismiss_btn:
-                dismiss_btn.click()
-                page.wait_for_timeout(500)
-            page.reload(wait_until="domcontentloaded")
-            page.wait_for_timeout(1000)
-            print("  Page reloaded after session banner")
+        text = session_banner.inner_text().strip().lower()
+        if "signed in with another tab" in text or "signed out" in text or "switched accounts" in text:
+            return True
+    return False
+
+
+def _dismiss_session_banner(page, navigate_url=None):
+    if not _has_session_banner(page):
+        return False
+    session_banner = page.query_selector('.flash-error, .flash-warn')
+    text = session_banner.inner_text().strip()
+    print(f"  Session banner detected: '{text[:80]}...'")
+    dismiss_btn = session_banner.query_selector('button, [aria-label="Dismiss"]')
+    if dismiss_btn:
+        dismiss_btn.click()
+        page.wait_for_timeout(500)
+    if navigate_url:
+        print(f"  Re-navigating to {navigate_url}")
+        page.goto(navigate_url, wait_until="domcontentloaded")
+    else:
+        page.reload(wait_until="domcontentloaded")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(2000)
+    print("  Page ready after session banner dismissal")
+    return True
 
 
 def _get_step_indicator(page):
@@ -186,7 +201,7 @@ def _wait_for_step_change(page, previous_step, description, timeout=15000):
             err_text = error_el.inner_text().strip()
             if "signed in with another tab" in err_text.lower() or "signed out" in err_text.lower() or "switched accounts" in err_text.lower():
                 print(f"  Session banner appeared during step transition — dismissing")
-                _dismiss_session_banner(page)
+                _dismiss_session_banner(page, navigate_url=EDUCATION_URL)
                 continue
             page.screenshot(path="debug_step_error.png")
             raise Exception(f"Step transition failed ({description}): {err_text}")
@@ -215,17 +230,26 @@ def apply_education(page, card_data, app_type="faculty"):
     page.route("**/settings/education/developer_pack_applications", _make_intercept_handler(photo_proof_json))
     print("Route interceptor installed for developer_pack_applications")
 
-    page.goto(EDUCATION_URL)
-    page.wait_for_load_state("domcontentloaded")
+    page.goto("https://github.com", wait_until="domcontentloaded")
+    page.wait_for_timeout(1500)
+    print("Refreshed GitHub session before education page")
+
+    page.goto(EDUCATION_URL, wait_until="domcontentloaded")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(1000)
     print("Navigated to education benefits page")
 
-    _dismiss_session_banner(page)
+    if _dismiss_session_banner(page, navigate_url=EDUCATION_URL):
+        if _has_session_banner(page):
+            page.screenshot(path="debug_session_banner_persist.png")
+            raise Exception("Session banner persists after reload — cookies may be expired")
 
-    start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=10000)
+    start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=15000)
+    print(f"  Found 'Start an application' button")
     start_btn.click()
     print("Clicked 'Start an application'")
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(1500)
 
     if app_type == "faculty":
         radio_id = "#dev_pack_form_application_type_faculty"
