@@ -161,14 +161,15 @@ def apply_education(page, card_data, app_type="faculty"):
 
     page.goto(EDUCATION_URL)
     page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(2000)
     print("Navigated to education benefits page")
 
     start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=15000)
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(1000)
     start_btn.click()
     print("Clicked 'Start an application'")
 
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(2000)
 
     if app_type == "faculty":
         radio_id = "#dev_pack_form_application_type_faculty"
@@ -176,23 +177,26 @@ def apply_education(page, card_data, app_type="faculty"):
         radio_id = "#dev_pack_form_application_type_student"
 
     radio = page.wait_for_selector(radio_id, state="visible", timeout=10000)
+    page.wait_for_timeout(1000)
     radio.click()
     print(f"Selected application type: {app_type}")
 
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(1500)
 
     school_input = page.wait_for_selector('#js-school-name-search', state="visible", timeout=10000)
+    page.wait_for_timeout(500)
     school_input.fill("")
     school_input.type(school_name, delay=100)
     print(f"Typed school name: {school_name}")
 
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(2000)
 
     page.wait_for_selector(
         '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection',
         state="visible",
         timeout=15000,
     )
+    page.wait_for_timeout(1000)
 
     all_options = page.query_selector_all(
         '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection'
@@ -217,21 +221,23 @@ def apply_education(page, card_data, app_type="faculty"):
     best_match.click()
     print(f"Selected school from dropdown: '{selected_name}'")
 
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(2000)
 
     input_val = school_input.input_value()
     print(f"  School input value after selection: '{input_val}'")
     if not input_val.strip():
-        page.screenshot(path="debug_school_not_selected.png")
         raise Exception("School selection failed — input is empty after clicking option")
 
     share_btn = page.query_selector('button:has-text("Share Location")')
     if share_btn and share_btn.is_visible():
+        page.wait_for_timeout(1000)
         share_btn.click()
         print("Clicked 'Share Location' — geolocation already granted via context")
-        page.wait_for_timeout(2000)
+        page.wait_for_timeout(3000)
     else:
         print("  'Share Location' button not found or not visible, skipping")
+
+    page.wait_for_timeout(1000)
 
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
     btn_text = continue_btn.inner_text().strip()
@@ -240,21 +246,24 @@ def apply_education(page, card_data, app_type="faculty"):
     if continue_btn.is_disabled():
         raise Exception("Continue button is disabled. Step 1 requirements not met.")
 
+    page.wait_for_timeout(1000)
     continue_btn.click()
     print("Clicked 'Continue'")
 
-    page.wait_for_timeout(3000)
+    page.wait_for_timeout(5000)
 
     if app_type == "student":
         proof_btn = page.wait_for_selector('button:has-text("Select...")', state="visible", timeout=10000)
+        page.wait_for_timeout(1000)
         proof_btn.click()
         print("Opened proof type selector")
 
+        page.wait_for_timeout(1000)
         id_card_option = page.wait_for_selector('[role="option"]:has-text("ID")', state="visible", timeout=10000)
         id_card_option.click()
         print("Selected proof type: ID Card")
 
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(1500)
 
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
     submit_text = submit_btn.inner_text().strip()
@@ -263,6 +272,7 @@ def apply_education(page, card_data, app_type="faculty"):
     if submit_btn.is_disabled():
         raise Exception("Submit button is disabled. Step 2 requirements not met.")
 
+    page.wait_for_timeout(1000)
     submit_btn.click()
     print("Clicked 'Submit Application'")
 
