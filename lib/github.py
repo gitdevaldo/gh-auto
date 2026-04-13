@@ -146,8 +146,8 @@ def _make_intercept_handler(photo_proof_json):
 
 
 def apply_education(page, card_data, app_type="faculty"):
-    school_name = card_data.get("school_name", "")
-    image_b64 = card_data.get("image", "")
+    school_name = card_data.get("schoolName", "")
+    image_b64 = card_data.get("imageBase64", "")
 
     if not school_name:
         raise Exception("Card API did not return school_name")
