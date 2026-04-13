@@ -322,33 +322,21 @@ def update_profile_name(page, name):
 def update_billing_address(page, first_name, last_name, address):
     _goto(page, BILLING_URL)
 
-    edit_btn = page.locator('button.js-edit-user-personal-profile:visible')
-    if edit_btn.count() == 0:
-        edit_btn = page.locator('button.js-add-billing-information-btn:visible')
-    if edit_btn.count() == 0:
-        add_link = page.locator('a[href*="billing"], button:has-text("Add"), button:has-text("Edit"), button:has-text("Update")')
-        visible_links = []
-        for i in range(add_link.count()):
-            if add_link.nth(i).is_visible():
-                visible_links.append(add_link.nth(i))
-        if visible_links:
-            edit_btn = visible_links[0]
-        else:
-            page.evaluate("""() => {
-                const btns = document.querySelectorAll('button.js-edit-user-personal-profile, button.js-add-billing-information-btn');
-                btns.forEach(b => { b.hidden = false; b.style.display = 'block'; });
-            }""")
-            page.wait_for_timeout(DELAY)
-            edit_btn = page.locator('button.js-edit-user-personal-profile, button.js-add-billing-information-btn')
-            if edit_btn.count() == 0:
-                _err("Billing update failed — edit button not found on the page")
-
-    if hasattr(edit_btn, 'first'):
-        edit_btn.first.click()
-    else:
-        edit_btn.click()
-
+    page.evaluate("""() => {
+        const btn = document.querySelector('button.js-edit-user-personal-profile') 
+                 || document.querySelector('button.js-add-billing-information-btn');
+        if (btn) btn.click();
+    }""")
     page.wait_for_timeout(DELAY)
+
+    form_visible = page.locator('#billing_contact_first_name').is_visible()
+    if not form_visible:
+        page.evaluate("""() => {
+            const form = document.querySelector('.js-personal-billing-info-form, .js-billing-information-form, form[action*="billing"]');
+            if (form) { form.hidden = false; form.style.display = 'block'; }
+        }""")
+        page.wait_for_timeout(DELAY)
+
     page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=15000)
     page.wait_for_timeout(DELAY)
 
