@@ -22,11 +22,11 @@ DELAY = 2000
 
 
 def _log(msg):
-    print(f"  {msg}")
+    print(msg)
 
 
 def _err(msg):
-    print(f"\n  [ERROR] {msg}\n")
+    print(f"[ERROR] {msg}")
     raise Exception(msg)
 
 
@@ -187,6 +187,7 @@ def ensure_2fa(page, username):
     if not_enabled and "not enabled yet" in not_enabled.inner_text().strip().lower():
         return _setup_2fa(page, username)
     else:
+        _log("2FA already set up")
         return None
 
 
@@ -321,17 +322,34 @@ def update_profile_name(page, name):
 def update_billing_address(page, first_name, last_name, address):
     _goto(page, BILLING_URL)
 
-    edit_btn = page.locator('button.js-edit-user-personal-profile')
+    edit_btn = page.locator('button.js-edit-user-personal-profile:visible')
     if edit_btn.count() == 0:
-        edit_btn = page.locator('button.js-add-billing-information-btn')
+        edit_btn = page.locator('button.js-add-billing-information-btn:visible')
     if edit_btn.count() == 0:
-        _err("Billing update failed — edit button not found on the page")
+        add_link = page.locator('a[href*="billing"], button:has-text("Add"), button:has-text("Edit"), button:has-text("Update")')
+        visible_links = []
+        for i in range(add_link.count()):
+            if add_link.nth(i).is_visible():
+                visible_links.append(add_link.nth(i))
+        if visible_links:
+            edit_btn = visible_links[0]
+        else:
+            page.evaluate("""() => {
+                const btns = document.querySelectorAll('button.js-edit-user-personal-profile, button.js-add-billing-information-btn');
+                btns.forEach(b => { b.hidden = false; b.style.display = 'block'; });
+            }""")
+            page.wait_for_timeout(DELAY)
+            edit_btn = page.locator('button.js-edit-user-personal-profile, button.js-add-billing-information-btn')
+            if edit_btn.count() == 0:
+                _err("Billing update failed — edit button not found on the page")
 
-    edit_btn.first.wait_for(state="visible", timeout=10000)
+    if hasattr(edit_btn, 'first'):
+        edit_btn.first.click()
+    else:
+        edit_btn.click()
+
     page.wait_for_timeout(DELAY)
-    edit_btn.first.click()
-
-    page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=10000)
+    page.wait_for_selector('#billing_contact_first_name', state="visible", timeout=15000)
     page.wait_for_timeout(DELAY)
 
     def fill_input(selector, value):

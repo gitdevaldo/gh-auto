@@ -14,11 +14,11 @@ from lib.mailer import send_report
 
 
 def log(msg):
-    print(f"  {msg}")
+    print(msg)
 
 
 def header(title):
-    print(f"\n  [{title}]")
+    print(f"\n[{title}]")
 
 
 def cleanup_profile(profile_name):
@@ -107,7 +107,7 @@ def main():
 
         cleanup_profile(profile_name)
 
-    print("\n  Done!\n")
+    print("\nDone!\n")
 
 
 if __name__ == "__main__":
