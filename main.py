@@ -70,22 +70,12 @@ def scrape_profile_data(cookies):
         print(f"Got honeypot field: {honeypot_name}")
 
         username = None
-        meta_el = page.query_selector('meta[name="user-login"]')
-        if meta_el:
-            username = meta_el.get_attribute("content")
+        for cookie in cookies:
+            if cookie["name"] == "dotcom_user":
+                username = cookie["value"]
+                break
         if not username:
-            form_el = page.query_selector('form.edit_user')
-            if form_el:
-                action = form_el.get_attribute("action")
-                if action and "/users/" in action:
-                    username = action.split("/users/")[-1].split("/")[0].split("?")[0]
-        if not username:
-            link_el = page.query_selector('a[href*="github.com/"][data-hydro-click]')
-            if link_el:
-                href = link_el.get_attribute("href")
-                username = href.rstrip("/").split("/")[-1]
-        if not username:
-            raise Exception("Could not determine GitHub username from page")
+            raise Exception("Could not find dotcom_user cookie")
         print(f"Got username: {username}")
 
         session_cookies = context.cookies("https://github.com")
