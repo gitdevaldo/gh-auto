@@ -6,20 +6,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export * from "./automation";
-export * from "./automationActionConfig";
-export * from "./automationRun";
-export * from "./automationRunPayload";
-export * from "./automationRunStatus";
-export * from "./createAutomationBody";
-export * from "./createAutomationBodyActionConfig";
 export * from "./healthStatus";
-export * from "./listRunsParams";
-export * from "./listRunsStatus";
-export * from "./receiveGithubWebhookBody";
-export * from "./runStats";
-export * from "./updateAutomationBody";
-export * from "./updateAutomationBodyActionConfig";
-export * from "./webhookAck";
-export * from "./webhookEvent";
-export * from "./webhookEventPayload";
