@@ -1,0 +1,130 @@
+<ul aria-labelledby="action-menu-61e6cf2b-f421-4f01-9a4b-628958084576-button" id="action-menu-61e6cf2b-f421-4f01-9a4b-628958084576-list" role="menu" data-view-component="true" class="ActionListWrap--inset ActionListWrap">
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="0" data-value="1. Dated school ID" id="item-ab342039-5a30-48ac-85ca-3441121f2553" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          1. Dated school ID
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="2. Dated official/unofficial transcript" id="item-d1ad6673-88a8-4806-ba1c-b7dd56991fd2" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          2. Dated official/unofficial transcript
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="3. Dated enrollment letter on school letterhead" id="item-2a1af97a-6e0a-419c-8bf6-6caee57034ec" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          3. Dated enrollment letter on school letterhead
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="4. Dated class schedule for the semester" id="item-a8d9f0c0-b4a8-4fbf-b68e-82023e794679" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          4. Dated class schedule for the semester
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="5. Dated syllabus for a class" id="item-92d06c8a-cbfd-484e-8417-b5a9e1fcf0db" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          5. Dated syllabus for a class
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="6. Dated receipt from bursar" id="item-abdf8f16-00da-41b8-a913-205ff5499de4" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          6. Dated receipt from bursar
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="7. Dated scholarship/financial aid letter" id="item-b66bdc43-c1c3-42e8-bcce-89846d3b4905" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          7. Dated scholarship/financial aid letter
+</span>      
+</button>
+  
+</li>
+        <li data-targets="action-list.items" role="none" data-view-component="true" class="ActionListItem">
+    
+    
+    <button tabindex="-1" data-value="8. Other (Example: Screenshot of school portal)" id="item-bcb442f5-3124-4634-8709-cc4180dc3f86" type="button" role="menuitemradio" aria-checked="false" data-view-component="true" class="ActionListContent">
+        <span class="ActionListItem-visual ActionListItem-action--leading">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check ActionListItem-singleSelectCheckmark">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+        </span>
+      
+        <span data-view-component="true" class="ActionListItem-label">
+          8. Other (Example: Screenshot of school portal)
+</span>      
+</button>
+  
+</li>
+</ul>

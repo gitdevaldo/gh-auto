@@ -497,27 +497,16 @@ def apply_education(page, card_data, app_type="faculty"):
     page.wait_for_timeout(5000)
 
     if app_type == "student":
-        proof_btn = page.locator('#dev_pack_form_academic_document_type_button, button:has-text("Select"), select#dev_pack_form_academic_document_type')
-        proof_btn.first.wait_for(state="visible", timeout=10000)
+        select_btn = page.locator('button.Button--secondary:has-text("Select...")')
+        select_btn.wait_for(state="visible", timeout=10000)
         page.wait_for_timeout(DELAY)
-        proof_btn.first.click()
+        select_btn.click()
         page.wait_for_timeout(DELAY)
 
-        option = page.locator('[role="option"], [role="menuitemradio"], option, li')
-        option_found = False
-        for i in range(option.count()):
-            text = option.nth(i).inner_text().strip().lower()
-            if "id" in text or "card" in text or "student" in text or "identity" in text:
-                option.nth(i).click()
-                option_found = True
-                break
-
-        if not option_found:
-            page.evaluate("""() => {
-                const sel = document.querySelector('select#dev_pack_form_academic_document_type');
-                if (sel) { sel.value = sel.options[1]?.value || sel.options[0]?.value; sel.dispatchEvent(new Event('change', {bubbles:true})); }
-            }""")
-
+        school_id_option = page.locator('button[role="menuitemradio"][data-value="1. Dated school ID"]')
+        school_id_option.wait_for(state="visible", timeout=10000)
+        page.wait_for_timeout(DELAY)
+        school_id_option.click()
         page.wait_for_timeout(DELAY)
 
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
