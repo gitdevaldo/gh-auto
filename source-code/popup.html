@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 360px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: #24292f;
+    }
+    h2 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      color: #2ea44f;
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: 8px;
+    }
+    h3 {
+      margin: 16px 0 8px 0;
+      font-size: 14px;
+      color: #57606a;
+    }
+    .section {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f6f8fa;
+      border-radius: 6px;
+      border: 1px solid #d0d7de;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .toggle-label {
+      font-weight: 500;
+    }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2ea44f;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    .status {
+      font-size: 12px;
+      color: #57606a;
+      margin-top: 4px;
+    }
+    .status.active {
+      color: #2ea44f;
+    }
+    .status.error {
+      color: #cf222e;
+    }
+    .info-box {
+      background: #ddf4ff;
+      border: 1px solid #54aeff;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .info-box.spoofed {
+      background: #dafbe1;
+      border-color: #2ea44f;
+    }
+    button {
+      width: 100%;
+      padding: 10px 16px;
+      background: #2ea44f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    button:hover {
+      background: #2c974b;
+    }
+    button:disabled {
+      background: #94d3a2;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      background: #f6f8fa;
+      color: #24292f;
+      border: 1px solid #d0d7de;
+    }
+    button.secondary:hover {
+      background: #f3f4f6;
+    }
+    .proxy-info {
+      font-size: 11px;
+      word-break: break-all;
+      color: #57606a;
+      margin-top: 6px;
+    }
+    .drop-zone {
+      border: 2px dashed #d0d7de;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      color: #57606a;
+      font-size: 13px;
+      transition: all 0.2s;
+      background: #fff;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #2ea44f;
+      background: #dafbe1;
+      color: #1a7f37;
+    }
+    .drop-zone.loaded {
+      border-color: #2ea44f;
+      border-style: solid;
+      background: #dafbe1;
+      color: #1a7f37;
+    }
+    .city-select {
+      padding: 4px 8px;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      color: #24292f;
+      cursor: pointer;
+      outline: none;
+    }
+    .city-select:focus {
+      border-color: #2ea44f;
+      box-shadow: 0 0 0 2px rgba(46, 164, 79, 0.2);
+    }
+    .city-select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .ip-banner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #d0d7de;
+      background: #f6f8fa;
+    }
+    .ip-banner.protected {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-color: #2ea44f;
+      color: #fff;
+    }
+    .ip-banner.unprotected {
+      background: linear-gradient(135deg, #2d1b1b 0%, #3d1f1f 100%);
+      border-color: #cf222e;
+      color: #fff;
+    }
+    .ip-banner.checking {
+      background: #f6f8fa;
+      color: #57606a;
+    }
+    .ip-flag {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .ip-address {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 13px;
+      flex: 1;
+    }
+    .ip-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ip-badge.protected {
+      background: #2ea44f;
+      color: #fff;
+    }
+    .ip-badge.unprotected {
+      background: #cf222e;
+      color: #fff;
+    }
+    .ip-location {
+      font-size: 11px;
+      font-weight: 400;
+      color: #8b949e;
+      margin-top: 4px;
+    }
+    .ip-refresh-btn {
+      background: none;
+      border: none;
+      color: #8b949e;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px;
+      margin: 0;
+      width: auto;
+      line-height: 1;
+    }
+    .ip-refresh-btn:hover {
+      color: #fff;
+      background: none;
+    }
+    .ip-refresh-btn.spinning {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h2>🎓 GitHub Education Helper</h2>
+
+  <!-- IP Checker Banner -->
+  <div id="ipBanner" class="ip-banner checking">
+    <span class="ip-flag" id="ipFlag">🌐</span>
+    <div style="flex:1;">
+      <span class="ip-address" id="ipAddress">Checking IP...</span>
+      <div class="ip-location" id="ipLocation"></div>
+    </div>
+    <span id="ipBadge" class="ip-badge" style="display:none;"></span>
+    <button class="ip-refresh-btn" id="ipRefreshBtn" title="Refresh IP">🔄</button>
+  </div>
+
+  <!-- City Selector -->
+  <div class="section">
+    <div class="toggle-row">
+      <span class="toggle-label">📍 Proxy City</span>
+      <select id="citySelect" class="city-select">
+        <option value="random">Random</option>
+        <option value="jakarta">Jakarta</option>
+        <option value="kediri">Kediri</option>
+        <option value="nganjuk">Nganjuk</option>
+        <option value="ponorogo">Ponorogo</option>
+        <option value="probolinggo">Probolinggo</option>
+        <option value="madiun">Madiun</option>
+      </select>
+    </div>
+    <div id="cityStatus" class="status">Kediri, East Java</div>
+  </div>
+
+  <!-- Proxy Section -->
+  <div class="section">
+    <div class="toggle-row">
+      <span class="toggle-label">🌐 Proxy</span>
+      <label class="toggle">
+        <input type="checkbox" id="proxyToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div id="proxyStatus" class="status">Disabled</div>
+    <div id="proxyInfo" class="proxy-info" style="display:none;"></div>
+  </div>
+
+  <!-- Spoofing Section -->
+  <div class="section">
+    <div class="toggle-row">
+      <span class="toggle-label">🕵️ Spoofing (Timezone, GPS, Lang)</span>
+      <label class="toggle">
+        <input type="checkbox" id="spoofToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div id="spoofStatus" class="status">Disabled</div>
+    <div id="spoofInfo" class="info-box spoofed" style="display:none;">
+      <div id="spoofDetails"></div>
+    </div>
+  </div>
+
+  <!-- Photo Intercept Section -->
+  <div class="section">
+    <h3>📷 Photo Intercept</h3>
+    <p style="font-size: 12px; color: #57606a; margin: 0 0 8px 0;">
+      Pre-load an image to replace the camera photo on submit
+    </p>
+    <div id="interceptDropZone" class="drop-zone">
+      <span id="interceptDropText">Click or drag image here</span>
+      <input type="file" id="interceptFile" accept="image/*" style="display:none;">
+    </div>
+    <div id="interceptPreview" style="display:none; margin-top: 8px; text-align: center;">
+      <img id="interceptImage" style="max-width: 100%; max-height: 120px; border-radius: 6px; border: 1px solid #d0d7de;">
+    </div>
+    <div id="interceptStatus" class="status" style="margin-top: 8px;"></div>
+    <div style="display: flex; gap: 8px; margin-top: 8px;">
+      <button id="interceptClear" class="secondary" style="flex:1; display:none;">Clear</button>
+    </div>
+  </div>
+
+  <!-- Address Generator Section -->
+  <div class="section">
+    <h3>📍 Address Generator</h3>
+    <p style="font-size: 12px; color: #57606a; margin: 0 0 8px 0;">
+      Generate Indonesian address for billing form
+    </p>
+    <button id="generateAddress">Generate & Fill Address</button>
+    <div id="addressStatus" class="status" style="margin-top: 8px;"></div>
+    <div id="addressPreview" class="info-box" style="display:none; margin-top: 8px;">
+      <div id="addressDetails"></div>
+    </div>
+  </div>
+
+  <button id="refreshProxy" class="secondary">🔄 Refresh Proxy</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

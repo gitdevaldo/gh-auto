@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Education Upload Enabler",
+  "version": "3.3",
+  "description": "Forces file upload option on GitHub Education benefits page with proxy and spoofing support.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "proxy",
+    "webRequest",
+    "webRequestAuthProvider"
+  ],
+  "host_permissions": [
+    "https://github.com/*",
+    "http://eclipseproxy.com/*",
+    "https://mocloc.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/settings/education/*", "https://github.com/settings/billing/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["interceptor.js"],
+      "matches": ["https://github.com/*"]
+    }
+  ]
+}

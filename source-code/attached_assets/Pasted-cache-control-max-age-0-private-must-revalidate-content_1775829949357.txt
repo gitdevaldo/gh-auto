@@ -1,0 +1,82 @@
+cache-control
+max-age=0, private, must-revalidate
+content-encoding
+gzip
+content-security-policy
+default-src 'none'; base-uri 'self'; child-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com *.rel.tunnels.api.visualstudio.com wss://*.rel.tunnels.api.visualstudio.com github.githubassets.com objects-origin.githubusercontent.com copilot-proxy.githubusercontent.com proxy.individual.githubcopilot.com proxy.business.githubcopilot.com proxy.enterprise.githubcopilot.com *.actions.githubusercontent.com wss://*.actions.githubusercontent.com productionresultssa0.blob.core.windows.net productionresultssa1.blob.core.windows.net productionresultssa2.blob.core.windows.net productionresultssa3.blob.core.windows.net productionresultssa4.blob.core.windows.net productionresultssa5.blob.core.windows.net productionresultssa6.blob.core.windows.net productionresultssa7.blob.core.windows.net productionresultssa8.blob.core.windows.net productionresultssa9.blob.core.windows.net productionresultssa10.blob.core.windows.net productionresultssa11.blob.core.windows.net productionresultssa12.blob.core.windows.net productionresultssa13.blob.core.windows.net productionresultssa14.blob.core.windows.net productionresultssa15.blob.core.windows.net productionresultssa16.blob.core.windows.net productionresultssa17.blob.core.windows.net productionresultssa18.blob.core.windows.net productionresultssa19.blob.core.windows.net github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com insights.github.com wss://alive.github.com wss://alive-staging.github.com api.githubcopilot.com api.individual.githubcopilot.com api.business.githubcopilot.com api.enterprise.githubcopilot.com; font-src github.githubassets.com; form-action 'self' github.com gist.github.com copilot-workspace.githubnext.com objects-origin.githubusercontent.com; frame-ancestors 'none'; frame-src viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src 'self' data: blob: github.githubassets.com media.githubusercontent.com camo.githubusercontent.com identicons.github.com avatars.githubusercontent.com private-avatars.githubusercontent.com github-cloud.s3.amazonaws.com objects.githubusercontent.com release-assets.githubusercontent.com secured-user-images.githubusercontent.com user-images.githubusercontent.com private-user-images.githubusercontent.com opengraph.githubassets.com marketplace-screenshots.githubusercontent.com copilotprodattachments.blob.core.windows.net/github-production-copilot-attachments/ github-production-user-asset-6210df.s3.amazonaws.com customer-stories-feed.github.com spotlights-feed.github.com objects-origin.githubusercontent.com *.githubusercontent.com; manifest-src 'self'; media-src github.com user-images.githubusercontent.com secured-user-images.githubusercontent.com private-user-images.githubusercontent.com github-production-user-asset-6210df.s3.amazonaws.com gist.github.com github.githubassets.com; script-src github.githubassets.com; style-src 'unsafe-inline' github.githubassets.com; upgrade-insecure-requests; worker-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ gist.github.com/assets-cdn/worker/
+content-type
+text/html; charset=utf-8
+date
+Fri, 10 Apr 2026 14:02:36 GMT
+etag
+W/"77d3d3efb8974e0ef2f0841a622a88f4"
+referrer-policy
+origin-when-cross-origin, strict-origin-when-cross-origin
+server
+github.com
+set-cookie
+last_write_ms=1775829756291; path=/; secure; HttpOnly; SameSite=Lax
+set-cookie
+_gh_sess=2DSmz9B%2F5QwVjmKgO1PN0gFILK2wtjiZtQJKkhNZVd6St6lJNYZxSHIk9cOH9hhr2Nx5Slp%2BTjI1UwXjbdOORjBE0ugdO3oKiQN%2FUzvHlato%2BTTpVx0wSLPScW1DiL7TvE1Ysa2TYtFddW8ipPP6%2FaN2lyyOehLFzVPAfS5ZkzjQvyRELeFtfDRl4T2d%2F%2FWG8%2FiexL%2Fu0CLKnfLAtN5kCDWS0IJTNlOi5V2yGxQ9A2SawUmaKv1Q3AMWYwTk0OFtiBbJATF9rMZh9D44yQuXmN4ZuajTLWr4CrO7XLVpOjjJgUHmAo2V0Z%2Fn5nxhyygltpLzy0otnDusuY9VKFDdFmO9V4yId%2FA%2Bj8vrCh0zuyesA8KYcz%2FEeDbZ%2Fhdpvi1Qli0W4M9Zgek4J0gODVKfSi36%2B0Lb9R3rh9gGNNUdR0ZARhJ8InQXN5ZVb7GJdOEOQBpQW8oZWq%2FfcwkCfv3yMoMyhnJDVDdQO4etlpMQ1Wv%2Bxv%2BWb7n2d2Ze%2BagscRgJ2MzLkGYPv%2FIER7FehZD9uDT2WrRHOwdGG2DU6x80wOeCC1bcBlkL3QJ9uzN437PPzvF%2FaxbpYX30%2FRjdCJJ3c1%2FDYwzSyGE6J51nFuSd0kWjWcMhymFaVbkCpGiYZDf6o%2BXGdOIVvhpCNCYeV9utxov44CEt1M5abrSnbTtukazuwxpC4gLUjKzy3UAQn5Xeh7haPDcRBu5WUXjlvCT%2B3hxuZooCjCHp%2FpZoTynfGr3zrG3LjlbmQeLzEEMRZjd1v3Kt19BDDMv4CYvaYTfI7EgmxhX3id%2FgFgI0FDbWiOJ%2BfNxpi1RfBlQJb23gFKH0u2m6CbbD8OrCr0KmR0sKELIfcvsItjds%2BmDijlrDuzh%2BNgnu--jHksBaEdKSpLUurN--3HvxO7tTiX%2FOVlItzoRD4A%3D%3D; path=/; secure; HttpOnly; SameSite=Lax
+strict-transport-security
+max-age=31536000; includeSubdomains; preload
+vary
+X-Fetch-Nonce, X-PJAX, X-PJAX-Container, Turbo-Visit, Turbo-Frame, X-Requested-With, Sec-Fetch-Site,Accept-Encoding, Accept, X-Requested-With
+x-content-type-options
+nosniff
+x-fetch-nonce
+v2:776b6036-9377-856c-b07f-4b88e04c06e3
+x-frame-options
+deny
+x-github-request-id
+2181:11070E:16AF33F:192B228:69D902FA
+x-html-safe
+c0b265d52e85bdb5c38af6b2e31be2caa8db0561fc71598d6940d21fb82b392a
+x-xss-protection
+0
+:authority
+github.com
+:method
+POST
+:path
+/settings/education/developer_pack_applications
+:scheme
+https
+accept
+text/vnd.turbo-stream.html, text/html, application/xhtml+xml
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7
+content-length
+15936
+content-type
+application/x-www-form-urlencoded;charset=UTF-8
+cookie
+_octo=GH1.1.2049350369.1775031132; GHCC=Required:1-Analytics:1-SocialMedia:1-Advertising:1; MicrosoftApplicationsTelemetryDeviceId=994ff2f5-612b-43d1-9638-058d8e3c26d9; MSFPC=GUID=6785cbfc955746e09a4aaafd557d5d10&HASH=6785&LV=202604&V=4&LU=1775031148495; _device_id=66185fd411ec6318e2db9f46f13696a2; saved_user_sessions=272754949%3AndrcVERmQquyhAOsQR2lCexaGMtdDIf2nhxix_60HS-Az0mm; user_session=ndrcVERmQquyhAOsQR2lCexaGMtdDIf2nhxix_60HS-Az0mm; __Host-user_session_same_site=ndrcVERmQquyhAOsQR2lCexaGMtdDIf2nhxix_60HS-Az0mm; logged_in=yes; dotcom_user=gitcanadadev; color_mode=%7B%22color_mode%22%3A%22auto%22%2C%22light_theme%22%3A%7B%22name%22%3A%22light%22%2C%22color_mode%22%3A%22light%22%7D%2C%22dark_theme%22%3A%7B%22name%22%3A%22dark%22%2C%22color_mode%22%3A%22dark%22%7D%7D; cpu_bucket=md; preferred_color_mode=dark; tz=Asia%2FBangkok; last_write_ms=1775829027485; _gh_sess=2ZKTJXdlES6lOttc2Qbrd%2Frzrr%2BdLtueu6cyQyv6asH%2FOJq1KLPPfa66kZ4HktJLi7NGdG0%2FCuUmS3SED2Bhw7d%2F5crMxVfNd9zxjfXIdpsGslMf%2FgZi63qK%2BkfVRnqcU8c38ulBkLkuAMgg27jzxKFiP%2B%2FQZcf7W3rRZekAymUg19YJ0leWijo0%2BEpnTEuf5N25vGw%2BdRauNJyd4iazR%2FrNgjCUh1fJrLqX7WAb3Sume%2B0n2oNu2EfrxZyouGUtUH99gCQU0XC9bs7CIgxbdKyvhRVRAipCGfDj%2Fm0mH%2BD6zWdcnSex8ZQbijW9MaZN2rNNlde5XUD2HtD2Y2IbFP57Nc5pPgvCXlaH%2B8WGEYreWneTYIig0qt11cssaBJNcUo7MYECDY84g4%2Fm8FadHoQKGMQ7NiAi4ggnsffFyUsZm0gAvG0A4LIGRN%2F5773Mixodsvx9pVFDax00%2BLrjRCJVhTIzhKyoAwUWmghkWEeo%2B2aeeQ4c3M4K6XSjNDQTwCyapVWUzpDHvG6XdbbuOI316h0MYJQYK7YLinUE1sR%2FSAyWlGG%2BVxBmu8xosTRGeCJt9mbi%2BlMqgJwHciIMiDPbz2zhRFQrdu5jms%2FFylu9ljHgVhJiUbfHfOy8%2BcgrT3x2mNAIgPT912rHI7r0QNxsMW9Xacw0HpEKO8eneCNd3%2Fd4%2BFpTeOYklZdEvOPkGzgidExsLIJA8XCm1Kh3Nw%3D%3D--%2BDt6GBu0LPLRv3wq--BoDUbNi1GskV8c9RAMU%2FwQ%3D%3D
+origin
+https://github.com
+priority
+u=1, i
+referer
+https://github.com/settings/education/benefits
+sec-ch-ua
+"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+turbo-frame
+dev-pack-form
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36
+x-fetch-nonce
+v2:776b6036-9377-856c-b07f-4b88e04c06e3
+x-github-client-version
+cb8ac222df81bbf3e5fb8886d3abee56e258f16a

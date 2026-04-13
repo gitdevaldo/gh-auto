@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Education Upload Enabler</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f6f8fa;
+      color: #24292f;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #d0d7de;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .badge {
+      display: inline-block;
+      background: #dafbe1;
+      color: #1a7f37;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      border: 1px solid #aceebb;
+    }
+    h1 {
+      font-size: 22px;
+      color: #2ea44f;
+      margin-bottom: 8px;
+    }
+    .version {
+      font-size: 12px;
+      color: #57606a;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 14px;
+      color: #57606a;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 15px;
+      margin-bottom: 12px;
+      color: #24292f;
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: 8px;
+    }
+    .feature-list {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+    .feature-list li {
+      font-size: 13px;
+      color: #57606a;
+      padding: 6px 0;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .feature-list li:last-child { border-bottom: none; }
+    .icon { font-size: 16px; flex-shrink: 0; }
+    .install-steps {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .install-steps ol {
+      padding-left: 18px;
+    }
+    .install-steps li {
+      font-size: 13px;
+      color: #57606a;
+      padding: 4px 0;
+      line-height: 1.6;
+    }
+    code {
+      background: #f3f4f6;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 12px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      color: #cf222e;
+    }
+    .files-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .file-chip {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #57606a;
+    }
+    .popup-preview-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 13px;
+      color: #0969da;
+      text-decoration: none;
+    }
+    .popup-preview-link:hover { text-decoration: underline; }
+    footer {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #8c959f;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">Chrome Extension &bull; Manifest V3</div>
+    <h1>🎓 GitHub Education Upload Enabler</h1>
+    <div class="version">Version 2.0</div>
+    <p>
+      A Chrome extension that bypasses the "camera only" requirement on the GitHub Education
+      benefits page, allowing you to upload files (ID cards, proof of enrollment) instead of
+      using a live webcam.
+    </p>
+
+    <h2>Features</h2>
+    <ul class="feature-list">
+      <li><span class="icon">📤</span><span>File upload bypass — forces the hidden <code>dev_pack_form_camera_required</code> flag to false and injects a custom upload UI</span></li>
+      <li><span class="icon">🌐</span><span>Proxy support — routes GitHub traffic through a configurable proxy via PAC script</span></li>
+      <li><span class="icon">🕵️</span><span>Spoofing — overrides timezone, GPS, language, and WebRTC to appear from a target region</span></li>
+      <li><span class="icon">📍</span><span>Address generator — generates Indonesian addresses for billing form auto-fill</span></li>
+    </ul>
+
+    <h2>Extension Files</h2>
+    <div class="files-grid">
+      <div class="file-chip">manifest.json</div>
+      <div class="file-chip">background.js</div>
+      <div class="file-chip">content.js</div>
+      <div class="file-chip">popup.html</div>
+      <div class="file-chip">popup.js</div>
+      <div class="file-chip">icon*.png</div>
+    </div>
+
+    <a class="popup-preview-link" href="/popup.html">→ Preview extension popup UI</a>
+
+    <h2 style="margin-top: 20px;">Installation in Chrome</h2>
+    <div class="install-steps">
+      <ol>
+        <li>Open Chrome and navigate to <code>chrome://extensions</code></li>
+        <li>Toggle <strong>Developer mode</strong> on (top-right)</li>
+        <li>Click <strong>Load unpacked</strong></li>
+        <li>Select this project folder</li>
+        <li>Refresh any GitHub Education page</li>
+      </ol>
+    </div>
+  </div>
+  <footer>GitHub Education Upload Enabler &bull; Replit Project View</footer>
+</body>
+</html>

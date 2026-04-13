@@ -1,0 +1,274 @@
+🚀 GitHub Upload Bypasser Loaded
+content.js:71 Injecting Upload UI...
+content.js:12 📷 Intercept image loaded from storage
+interceptor.js:165 🔗 Fetch/XHR interceptor installed (MAIN world, CSP bypass)
+VM3729:4 Executing inline script violates the following Content Security Policy directive 'script-src github.githubassets.com'. Either the 'unsafe-inline' keyword, a hash ('sha256-EhLWV3UJgY8L5Tq86oEy0Lov8JYnmWj0WkaVS7HkR4o='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
+(anonymous) @ VM3729:4
+(anonymous) @ VM3729:6Understand this error
+VM3730:4 Executing inline script violates the following Content Security Policy directive 'script-src github.githubassets.com'. Either the 'unsafe-inline' keyword, a hash ('sha256-EhLWV3UJgY8L5Tq86oEy0Lov8JYnmWj0WkaVS7HkR4o='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
+(anonymous) @ VM3730:4
+(anonymous) @ VM3730:6Understand this error
+fetch-patch.ts:11  GET https://github.com/github-copilot/chat/entitlement 404 (Not Found)
+(anonymous) @ fetch-patch.ts:11
+window.fetch @ interceptor.js:139
+verifiedFetch @ verified-fetch.ts:30
+verifiedFetchJSON @ verified-fetch.ts:113
+(anonymous) @ usePlan.tsx:10
+(anonymous) @ query.js:224
+(anonymous) @ retryer.js:77
+(anonymous) @ retryer.js:119
+fetch @ query.js:271
+#y @ queryObserver.js:179
+onSubscribe @ queryObserver.js:52
+subscribe @ subscribable.js:9
+(anonymous) @ useBaseQuery.js:59
+ly @ react-dom-client.production.js:4747
+o1 @ react-dom-client.production.js:8583
+iE @ react-dom-client.production.js:10126
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10176
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10120
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10129
+iC @ react-dom-client.production.js:10101
+iE @ react-dom-client.production.js:10137
+sz @ react-dom-client.production.js:11763
+sF @ react-dom-client.production.js:11739
+sZ @ react-dom-client.production.js:12085
+sQ @ react-dom-client.production.js:11956
+s_ @ react-dom-client.production.js:11726
+sE @ react-dom-client.production.js:11521
+sc @ react-dom-client.production.js:10920
+su @ react-dom-client.production.js:10826
+sY @ react-dom-client.production.js:12078
+_ @ scheduler.production.js:151
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+_ @ scheduler.production.js:187
+postMessage
+(anonymous) @ scheduler.production.js:202
+(anonymous) @ scheduler.production.js:325
+sX @ react-dom-client.production.js:12055
+sK @ react-dom-client.production.js:11978
+(anonymous) @ react-dom-client.production.js:12095
+PendingScript
+(anonymous) @ load_script:65
+(anonymous) @ jsonp_chunk_loading:52
+(anonymous) @ ensure_chunk:7
+(anonymous) @ ensure_chunk:6
+(anonymous) @ x_ensure_retry:13
+(anonymous) @ element-registry.ts:259
+Promise.then
+(anonymous) @ lazy-define.js:58
+requestAnimationFrame
+k @ lazy-define.js:50
+(anonymous) @ lazy-define.js:88
+C @ lazy-define.js:75
+(anonymous) @ element-registry.ts:2
+f @ wp-runtime-ccc7bb0994f272ea.js:2
+(anonymous) @ element-registry-bdb4e9345dc06524.js:2
+(anonymous) @ jsonp_chunk_loading:71
+(anonymous) @ element-registry-bdb4e9345dc06524.js:2Understand this error
+interceptor.js:125 📷 Detected POST to developer_pack_applications
+interceptor.js:126 📷 Body type: object, constructor: URLSearchParams
+interceptor.js:130 📷 Intercept data found (543202 chars), replacing...
+interceptor.js:40 ⚠️ URLSearchParams has no dev_pack_form[photo_proof]. Keys:
+interceptor.js:42   - continue
+interceptor.js:42   - authenticity_token
+interceptor.js:42   - dev_pack_form[application_type]
+2interceptor.js:42   - dev_pack_form[school_name]
+interceptor.js:42   - dev_pack_form[camera_required]
+interceptor.js:42   - dev_pack_form[email_domains]
+interceptor.js:42   - dev_pack_form[new_school]
+interceptor.js:42   - dev_pack_form[override_distance_limit]
+interceptor.js:42   - dev_pack_form[selected_school_id]
+interceptor.js:42   - dev_pack_form[two_factor_required]
+interceptor.js:42   - dev_pack_form[user_too_far_from_school]
+interceptor.js:42   - dev_pack_form[school_email]
+interceptor.js:42   - dev_pack_form[latitude]
+interceptor.js:42   - dev_pack_form[longitude]
+interceptor.js:42   - dev_pack_form[location_shared]
+interceptor.js:42   - dev_pack_form[utm_source]
+interceptor.js:42   - dev_pack_form[utm_content]
+interceptor.js:42   - dev_pack_form[form_variant]
+interceptor.js:42   - dev_pack_form[browser_location]
+interceptor.js:42   - continue
+7content.js:53 Found camera requirement input. Setting to false.
+
+That console log is appear after I continue after put the type and school name, and location. And then move to the next step on same page which is capture img.
+
+After I submit, it's appear this console log
+65content.js:53 Found camera requirement input. Setting to false.
+interceptor.js:125 📷 Detected POST to developer_pack_applications
+interceptor.js:126 📷 Body type: object, constructor: URLSearchParams
+interceptor.js:130 📷 Intercept data found (543202 chars), replacing...
+interceptor.js:37 ✅ photo_proof replaced in URLSearchParams
+4content.js:53 Found camera requirement input. Setting to false.
