@@ -31,7 +31,10 @@ def _err(msg):
 
 
 def _goto(page, url):
-    page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    try:
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    except Exception:
+        pass
     page.wait_for_timeout(3000)
 
 
