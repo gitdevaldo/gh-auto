@@ -1,7 +1,7 @@
 [
     {
         "domain": "github.com",
-        "expirationDate": 1777281525.546309,
+        "expirationDate": 1777283834.628483,
         "hostOnly": true,
         "httpOnly": true,
         "name": "__Host-user_session_same_site",
@@ -10,11 +10,11 @@
         "secure": true,
         "session": false,
         "storeId": null,
-        "value": "MyQlx5h9J3gpQT9bHder3st46n8u3iJ5UMTgSOVXi4Kbms0l"
+        "value": "M6n2fTndAFwwHVCElTRaHWA5L3FJxHodryLLZwLSmyYzj1wi"
     },
     {
         "domain": ".github.com",
-        "expirationDate": 1807381746.232915,
+        "expirationDate": 1807610234.629622,
         "hostOnly": false,
         "httpOnly": true,
         "name": "dotcom_user",
@@ -52,7 +52,7 @@
     },
     {
         "domain": "github.com",
-        "expirationDate": 1807381744.168405,
+        "expirationDate": 1807610211.378902,
         "hostOnly": true,
         "httpOnly": false,
         "name": "MicrosoftApplicationsTelemetryDeviceId",
@@ -78,7 +78,7 @@
     },
     {
         "domain": "github.com",
-        "expirationDate": 1783621746.232022,
+        "expirationDate": 1783850234.627534,
         "hostOnly": true,
         "httpOnly": true,
         "name": "saved_user_sessions",
@@ -87,7 +87,7 @@
         "secure": true,
         "session": false,
         "storeId": null,
-        "value": "275156113%3AMyQlx5h9J3gpQT9bHder3st46n8u3iJ5UMTgSOVXi4Kbms0l"
+        "value": "275156113%3AM6n2fTndAFwwHVCElTRaHWA5L3FJxHodryLLZwLSmyYzj1wi"
     },
     {
         "domain": "github.com",
@@ -112,7 +112,7 @@
         "secure": true,
         "session": true,
         "storeId": null,
-        "value": "%2BGlyUv4aOjlH4xNpTufa4tliyj2tzpFfujoSAqeRAtFYuZDsAyEpQdUnwDpZiLL6uotxBAfuQgLo1cmwrbYNh9A22E%2Fg8MtyfbfstZtshPEfmgw%2BzF%2BNqFED1UCkLXctBaeCqmlisNNuCs8JNKaX5w7gv%2BRWUPTthlroHezur1s43rcmvzniaXXh9qbVB3SHh9sLxJrNvLd669fnKuK%2BYOFBMyVu1D%2FMDCotlLprf29GO0DNIj4RRygCREhYoxFDPkSB9xNC88oMbkUmq9wOQ3vP88N9DjJ3hJVWF4ezXj%2Fcr6NHSWMSBhyUSF%2BwdM3JKiHyH6B8iGob%2FiiitNcMJmuBX5uwX99kdx1GgMZYKeUtKtab02ip6Ibgu75eSveIQWDNjdPY5lbsxgvnfgapqBBUC%2FmjAd72i8B%2B%2BGtcmeW%2B7rYo7XuViBeLhMGJBvp2bcR50GX2q8aIuFpyMS1xswZX0Hjl7qHjoQ%2Boqxx3wFbZdwUwnhRVpyf41T81Y2mNyXiGy3RiAP0o9em1TaYN2LHztX6D9mxfkAGZoBqYRUdOPjbZ%2FKjM6g03R%2BNnxajsTxJBEncE88py8FheDoRn5UfMUSAl1Ejinch%2F76WrtVYqy3CfxMb8pj3nhPFEolrWPZj0qfWA8oAqOBQBBbytv0bwmzBBKoM8%2FAIaRR97z1hgdchu%2FWELUd8vehgrYZtw4yMtrna2rOVusRbrR2cEKXv%2BTB9ZPzvtLk48VbL1%2BnL0dQR6IU7zCWe%2Bup4dg0TA3bZRMnH53P%2FDVtttkKfeP%2Ft0SCdDwEW6ie%2F%2Fh%2BR7NvHdR6MQNLiQbRFhAmJhP68IdhvCUs9W3cXJQ06a5oWTPI0pHic%3D--uNM%2Fzc1uOGGJPLkC--kkB4PuHermPV7F6ghudGYQ%3D%3D"
+        "value": "MgnLR7RLta8WQrcmAKnLxJjGQbzLxsw4nYXaSfyWG6zzurRZMwQQUG527p5w4h2wWwYxdjkuU9KSBlOePCaRZfhL9tFu3QjExcQZG799VkJVDhNZIMFkFnmbM9A1hf32eY7zR3%2FR%2FDjzSnHiylNItKu9iVn3Z8jk2zflCtVCiMU%2FUxH8BQCjFvEQgW8kJ%2FbOPfl3qDcCdf4VC%2Fj8qy%2BIpnbXCUxkAO8hxxtk47%2F5u6Wa9SL6Exsy%2B05KtHXR7004rEkClfmgQWZzKW%2BFIV4ebGkAGubfzBxvTQtUtn%2FwdrAAGwVXoxoZCLK1Og1G3hIaAeJzbLx2KM1BPBON09PRUfD6IReFvfA7JD2N7GKp5RglSJ34Q2h0rdaJbFqRSn6TRK8ZvKZnpt%2F6nTub3zCFA5dtjVhUEhkSopSCHqIPDnD9RZrNicDEq8YxdYG3S8Q7AtUWofOovvK4plDnApwtHPYSCmDFOAXEQxXswQthBt%2Bs471ezpFjg3PHbEnzXOtmAS%2BNCgx%2F7Ez5MvhY%2FN%2FZjBge5UBV42uGfBU8P%2FTM7C3fuNx7ZdYPyAwPpJoR4Xnz2GdOw3SPt7q59TPw3qnjBofUTBpu7Tb9IcyRJbo%2Bn6c2y3UpNo5VfroAMYbrgzxR8bRiTQM%2BiU%2FLppfeYTeb8nGio6lLDsvFjR66Gg%2FL%2Fjarels9sdeIBMMVt6yW4qPXpBfPfxU22a88E0xiVYaX7%2FgVU%2FhRg7FAfSAd5EB8amjzOuBa1jlSMInOsyEtu2RmRT1UcftDZo2otLDRevsAcEKg0W7QxivoSzSb05YBoZSxkPRnI1KXXSI7jltBpWJBBIenDE9F5AQKpQpLNZmJHlht8cEaW62w4dkXoVAaEDp3Zh%2Bdd746ZcL5rwYNDfhvWEToqIQfQuEUasz3CEjumyqcUHd606%2F7SnGT1pbO0TAD3njgJKVevHLMGyLrXPB3ULQvR%2B1V%2BWrsdGu%2FwbpDFMlAWUUgUFArvkqxt4mDgNBGDyoKaroa6MkZJUoArMhxpoiw1496grr7hxhY%2BEoCokzH9lreI8sIZA%2BfCWH%2BGeURGpOL--MMZuCGUT9wa4R65a--ELv3zly8WhgsL9HlyhvYVA%3D%3D"
     },
     {
         "domain": ".github.com",
@@ -129,6 +129,19 @@
     },
     {
         "domain": ".github.com",
+        "expirationDate": 1776076011,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "ai_session",
+        "path": "/",
+        "sameSite": "no_restriction",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "m9w9zp76/vBrJDwPTbhCGZ|1776074211395|1776074211395"
+    },
+    {
+        "domain": ".github.com",
         "hostOnly": false,
         "httpOnly": false,
         "name": "color_mode",
@@ -140,8 +153,20 @@
         "value": "%7B%22color_mode%22%3A%22auto%22%2C%22light_theme%22%3A%7B%22name%22%3A%22light%22%2C%22color_mode%22%3A%22light%22%7D%2C%22dark_theme%22%3A%7B%22name%22%3A%22dark%22%2C%22color_mode%22%3A%22dark%22%7D%7D"
     },
     {
+        "domain": "github.com",
+        "hostOnly": true,
+        "httpOnly": true,
+        "name": "last_write_ms",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": true,
+        "storeId": null,
+        "value": "1776074234304"
+    },
+    {
         "domain": ".github.com",
-        "expirationDate": 1807381746.232756,
+        "expirationDate": 1807610234.628752,
         "hostOnly": false,
         "httpOnly": true,
         "name": "logged_in",
@@ -178,7 +203,19 @@
     },
     {
         "domain": "github.com",
-        "expirationDate": 1777281525.546189,
+        "hostOnly": true,
+        "httpOnly": true,
+        "name": "tz",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": true,
+        "storeId": null,
+        "value": "Asia%2FBangkok"
+    },
+    {
+        "domain": "github.com",
+        "expirationDate": 1777283834.62818,
         "hostOnly": true,
         "httpOnly": true,
         "name": "user_session",
@@ -187,6 +224,6 @@
         "secure": true,
         "session": false,
         "storeId": null,
-        "value": "MyQlx5h9J3gpQT9bHder3st46n8u3iJ5UMTgSOVXi4Kbms0l"
+        "value": "M6n2fTndAFwwHVCElTRaHWA5L3FJxHodryLLZwLSmyYzj1wi"
     }
 ]

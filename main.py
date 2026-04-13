@@ -24,30 +24,54 @@ def load_cookies():
         return json.load(f)
 
 
-def scrape_profile_data(cookies):
-    with Camoufox(headless=True) as browser:
-        context = browser.new_context()
+def get_username(cookies):
+    for cookie in cookies:
+        if cookie["name"] == "dotcom_user":
+            return cookie["value"]
+    raise Exception("Could not find dotcom_user cookie")
 
-        for cookie in cookies:
-            c = {
-                "name": cookie["name"],
-                "value": cookie["value"],
-                "domain": cookie["domain"],
-                "path": cookie.get("path", "/"),
-            }
-            if cookie.get("secure"):
-                c["secure"] = True
-            if cookie.get("httpOnly"):
-                c["httpOnly"] = True
-            if cookie.get("sameSite"):
-                site = cookie["sameSite"]
-                if site == "no_restriction":
-                    c["sameSite"] = "None"
-                elif site in ("lax", "Lax"):
-                    c["sameSite"] = "Lax"
-                elif site in ("strict", "Strict"):
-                    c["sameSite"] = "Strict"
-            context.add_cookies([c])
+
+def get_profile_dir(username):
+    profiles_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles")
+    profile_path = os.path.join(profiles_dir, username)
+    if not os.path.exists(profile_path):
+        os.makedirs(profile_path, exist_ok=True)
+        print(f"Created new browser profile: {profile_path}")
+    else:
+        print(f"Using existing browser profile: {profile_path}")
+    return profile_path
+
+
+def format_cookies(cookies):
+    formatted = []
+    for cookie in cookies:
+        c = {
+            "name": cookie["name"],
+            "value": cookie["value"],
+            "domain": cookie["domain"],
+            "path": cookie.get("path", "/"),
+        }
+        if cookie.get("secure"):
+            c["secure"] = True
+        if cookie.get("httpOnly"):
+            c["httpOnly"] = True
+        if cookie.get("sameSite"):
+            site = cookie["sameSite"]
+            if site == "no_restriction":
+                c["sameSite"] = "None"
+            elif site in ("lax", "Lax"):
+                c["sameSite"] = "Lax"
+            elif site in ("strict", "Strict"):
+                c["sameSite"] = "Strict"
+        formatted.append(c)
+    return formatted
+
+
+def scrape_profile_data(cookies, username):
+    profile_dir = get_profile_dir(username)
+
+    with Camoufox(headless=True, persistent_context=True, user_data_dir=profile_dir) as context:
+        context.add_cookies(format_cookies(cookies))
 
         page = context.new_page()
         page.goto("https://github.com/settings/profile")
@@ -69,19 +93,8 @@ def scrape_profile_data(cookies):
         honeypot_name = honeypot_el.get_attribute("name") if honeypot_el else "required_field_1b05"
         print(f"Got honeypot field: {honeypot_name}")
 
-        username = None
-        for cookie in cookies:
-            if cookie["name"] == "dotcom_user":
-                username = cookie["value"]
-                break
-        if not username:
-            raise Exception("Could not find dotcom_user cookie")
-        print(f"Got username: {username}")
-
         session_cookies = context.cookies("https://github.com")
         print(f"Got {len(session_cookies)} session cookies")
-
-        context.close()
 
     return {
         "token": token,
@@ -153,7 +166,9 @@ def update_github_profile(name, profile_data):
 def main():
     name = get_card_name()
     cookies = load_cookies()
-    profile_data = scrape_profile_data(cookies)
+    username = get_username(cookies)
+    print(f"Got username: {username}")
+    profile_data = scrape_profile_data(cookies, username)
     update_github_profile(name, profile_data)
 
 
