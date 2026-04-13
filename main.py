@@ -7,7 +7,7 @@ from lib.card import get_card_data
 from lib.cookies import load_cookies, get_username
 from lib.address import get_random_address, split_name
 from lib.browser import open_browser
-from lib.github import update_profile_name, update_billing_address, apply_education
+from lib.github import update_profile_name, update_billing_address, apply_education, ensure_2fa
 
 
 def main():
@@ -31,6 +31,8 @@ def main():
     context, ctx = open_browser(username, cookies)
     try:
         page = ctx.new_page()
+
+        ensure_2fa(page, username)
 
         update_profile_name(page, name)
 

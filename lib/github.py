@@ -1,13 +1,136 @@
 import base64
 import json
+import os
 import re
 from urllib.parse import parse_qs, urlencode
+
+import pyotp
 
 from lib.browser import open_browser
 
 PROFILE_URL = "https://github.com/settings/profile"
 BILLING_URL = "https://github.com/settings/billing/payment_information"
 EDUCATION_URL = "https://github.com/settings/education/benefits"
+SECURITY_URL = "https://github.com/settings/security"
+TWO_FA_SETUP_URL = "https://github.com/settings/two_factor_authentication/setup/intro"
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OTP_DIR = os.path.join(BASE_DIR, "otp")
+
+
+def ensure_2fa(page, username):
+    page.goto(SECURITY_URL)
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(2000)
+    print("Navigated to security settings")
+
+    not_enabled = page.query_selector('h2.blankslate-heading')
+    if not_enabled and "not enabled yet" in not_enabled.inner_text().strip().lower():
+        print("2FA is NOT enabled — starting setup")
+        return _setup_2fa(page, username)
+    else:
+        print("2FA is already enabled")
+        return None
+
+
+def _setup_2fa(page, username):
+    enable_btn = page.query_selector('a[href="/settings/two_factor_authentication/setup/intro"]')
+    if not enable_btn:
+        raise Exception("Could not find 'Enable two-factor authentication' button")
+
+    page.wait_for_timeout(1000)
+    enable_btn.click()
+    print("Clicked 'Enable two-factor authentication'")
+
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(2000)
+
+    setup_key_btn = page.wait_for_selector('button:has-text("setup key")', state="visible", timeout=15000)
+    page.wait_for_timeout(1000)
+    setup_key_btn.click()
+    print("Clicked 'setup key'")
+
+    page.wait_for_timeout(2000)
+
+    secret_el = page.wait_for_selector('[data-target="two-factor-setup-verification.mashedSecret"]', state="visible", timeout=10000)
+    secret = secret_el.inner_text().strip()
+    print(f"Got TOTP secret: {secret}")
+
+    page.wait_for_timeout(1000)
+
+    close_btn = page.query_selector('button[aria-label="Close"], button:has(svg.octicon-x)')
+    if close_btn and close_btn.is_visible():
+        close_btn.click()
+        print("Closed setup key popup")
+    else:
+        page.keyboard.press("Escape")
+        print("Pressed Escape to close popup")
+
+    page.wait_for_timeout(1500)
+
+    totp = pyotp.TOTP(secret)
+    otp_code = totp.now()
+    print(f"Generated OTP code: {otp_code}")
+
+    otp_input = page.wait_for_selector('input[data-target="two-factor-setup-verification.appOtpInput"]', state="visible", timeout=10000)
+    page.wait_for_timeout(1000)
+    otp_input.fill("")
+    otp_input.type(otp_code, delay=100)
+    print(f"Entered OTP code: {otp_code}")
+
+    page.wait_for_timeout(5000)
+
+    recovery_heading = page.wait_for_selector('h2.wizard-step-title:has-text("Download your recovery codes")', state="visible", timeout=15000)
+    print("Recovery codes step appeared")
+
+    page.wait_for_timeout(2000)
+
+    download_btn = page.query_selector('button[data-action="click:two-factor-setup-recovery-codes#onDownloadClick"]')
+    if not download_btn:
+        download_btn = page.query_selector('button:has-text("Download")')
+    if not download_btn:
+        raise Exception("Could not find Download recovery codes button")
+
+    with page.expect_download() as download_info:
+        download_btn.click()
+        print("Clicked 'Download' recovery codes")
+
+    download = download_info.value
+    page.wait_for_timeout(2000)
+
+    user_otp_dir = os.path.join(OTP_DIR, username)
+    os.makedirs(user_otp_dir, exist_ok=True)
+
+    recovery_path = os.path.join(user_otp_dir, "recovery_codes.txt")
+    download.save_as(recovery_path)
+    print(f"Saved recovery codes to {recovery_path}")
+
+    secret_path = os.path.join(user_otp_dir, "secret.txt")
+    with open(secret_path, "w") as f:
+        f.write(secret)
+    print(f"Saved TOTP secret to {secret_path}")
+
+    page.wait_for_timeout(1500)
+
+    continue_btn = page.query_selector('button:has-text("I have saved my recovery codes")')
+    if not continue_btn:
+        continue_btn = page.query_selector('button[data-action="click:single-page-wizard-step#onNext"]')
+    if not continue_btn:
+        raise Exception("Could not find 'I have saved my recovery codes' button")
+
+    page.wait_for_timeout(1000)
+    continue_btn.click()
+    print("Clicked 'I have saved my recovery codes'")
+
+    page.wait_for_timeout(5000)
+
+    success_heading = page.query_selector('h1')
+    if success_heading and "2FA" in success_heading.inner_text() and "enabled" in success_heading.inner_text().lower():
+        print("SUCCESS: Two-factor authentication is now enabled!")
+    else:
+        print("2FA setup completed — verifying status...")
+
+    return secret
 
 
 def update_profile_name(page, name):

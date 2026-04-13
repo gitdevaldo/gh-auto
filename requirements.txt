@@ -1,6 +1,7 @@
 camoufox[geoip]==0.4.11
 requests==2.33.1
 python-dotenv==1.2.2
+pyotp==2.9.0
 
 # System dependencies (replit.nix):
 # gtk3, glib, dbus-glib, alsa-lib, xorg.libXrender, xorg.libXt
