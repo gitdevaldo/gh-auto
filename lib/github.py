@@ -286,8 +286,10 @@ def update_profile_name(page, name):
 
     page.wait_for_timeout(500)
 
-    with page.expect_navigation(wait_until="domcontentloaded", timeout=15000):
-        submit_btn.click()
+    submit_btn.click()
+
+    page.wait_for_timeout(3000)
+    page.wait_for_load_state("networkidle")
 
     _log(f"Profile updated: {name}")
 
