@@ -17,6 +17,10 @@ def log(msg):
     print(f"  {msg}")
 
 
+def header(title):
+    print(f"\n  [{title}]")
+
+
 def cleanup_profile(profile_name):
     profile_dir = get_profile_dir(profile_name)
     if os.path.exists(profile_dir):
@@ -34,7 +38,7 @@ def main():
                         help="Send success report to this email address")
     args, remaining = parser.parse_known_args()
 
-    print()
+    header("Preparing")
 
     card_data = get_card_data()
     name = card_data["name"]
@@ -53,23 +57,25 @@ def main():
 
         profile_name = email
 
+        header("Login")
         context, ctx = open_browser_fresh(profile_name)
         try:
             page = ctx.new_page()
 
             username = login_github(page, email, password)
 
+            header("Setup")
             ensure_2fa(page, username)
-
             update_profile_name(page, name)
-
             update_billing_address(page, first_name, last_name, address)
 
+            header("Application")
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
 
         if args.report:
+            header("Report")
             if send_report(args.report, username, card_data, address, args.type):
                 log(f"Report sent → {args.report}")
 
@@ -80,21 +86,22 @@ def main():
         profile_name = username
         log(f"User: {username}")
 
+        header("Setup")
         context, ctx = open_browser(username, cookies)
         try:
             page = ctx.new_page()
 
             ensure_2fa(page, username)
-
             update_profile_name(page, name)
-
             update_billing_address(page, first_name, last_name, address)
 
+            header("Application")
             apply_education(page, card_data, app_type=args.type)
         finally:
             context.__exit__(None, None, None)
 
         if args.report:
+            header("Report")
             if send_report(args.report, username, card_data, address, args.type):
                 log(f"Report sent → {args.report}")
 
