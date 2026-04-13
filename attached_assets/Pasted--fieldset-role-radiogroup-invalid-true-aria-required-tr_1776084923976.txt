@@ -1,0 +1,43 @@
+<fieldset role="radiogroup" invalid="true" aria-required="true" aria-invalid="true" aria-describedby="validation-9aeca297-461b-4102-a7d8-e2bd4aea9b39" class="">
+      <legend class="FormControl-label">
+        Why are you not on campus?
+</legend>    <div class="mb-2">
+      
+    </div>
+    <div class="FormControl-spacingWrapper">
+  
+        <div class="FormControl-radio-wrap">
+  <input autofocus="autofocus" class="FormControl-radio" type="radio" value="sem_class_not_started" name="dev_pack_form[far_from_campus_reason]" id="dev_pack_form_far_from_campus_reason_sem_class_not_started">
+  <span class="FormControl-radio-labelWrap">
+    <label class="FormControl-label" for="dev_pack_form_far_from_campus_reason_sem_class_not_started">
+      This semester's classes have not yet started
+</label>      
+  </span>
+</div>
+        <div class="FormControl-radio-wrap">
+  <input class="FormControl-radio" type="radio" value="distant_course_work" name="dev_pack_form[far_from_campus_reason]" id="dev_pack_form_far_from_campus_reason_distant_course_work">
+  <span class="FormControl-radio-labelWrap">
+    <label class="FormControl-label" for="dev_pack_form_far_from_campus_reason_distant_course_work">
+      All coursework is via distance learning
+</label>      
+  </span>
+</div>
+        <div class="FormControl-radio-wrap">
+  <input class="FormControl-radio" type="radio" value="vpn" name="dev_pack_form[far_from_campus_reason]" id="dev_pack_form_far_from_campus_reason_vpn">
+  <span class="FormControl-radio-labelWrap">
+    <label class="FormControl-label" for="dev_pack_form_far_from_campus_reason_vpn">
+      I am using a VPN
+</label>      
+  </span>
+</div>
+        <div class="FormControl-radio-wrap">
+  <input class="FormControl-radio" type="radio" value="other" name="dev_pack_form[far_from_campus_reason]" id="dev_pack_form_far_from_campus_reason_other">
+  <span class="FormControl-radio-labelWrap">
+    <label class="FormControl-label" for="dev_pack_form_far_from_campus_reason_other">
+      Other:
+</label>      
+  </span>
+</div>
+
+</div>
+</fieldset>

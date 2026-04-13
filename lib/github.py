@@ -278,4 +278,35 @@ def apply_education(page, card_data, app_type="faculty"):
 
     page.wait_for_timeout(5000)
 
+    location_mismatch = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
+    if location_mismatch and location_mismatch.is_visible():
+        print("Step 3 detected: location mismatch — need to provide reason")
+
+        page.wait_for_timeout(1000)
+        distance_radio = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
+        distance_radio.click()
+        print("  Selected: 'All coursework is via distance learning'")
+
+        page.wait_for_timeout(1000)
+
+        reason_input = page.query_selector('#dev_pack_form_other_reason_text')
+        if reason_input and reason_input.is_visible():
+            reason_input.fill("")
+            reason_input.type("My education program uses a distance learning method", delay=50)
+            print("  Filled reason text")
+            page.wait_for_timeout(1000)
+
+        final_submit = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
+        final_text = final_submit.inner_text().strip()
+        print(f"  Final submit button text: '{final_text}'")
+
+        if final_submit.is_disabled():
+            raise Exception("Final submit button is disabled. Step 3 requirements not met.")
+
+        page.wait_for_timeout(1000)
+        final_submit.click()
+        print("Clicked 'Submit Application' (step 3)")
+
+        page.wait_for_timeout(5000)
+
     print(f"Current URL after submit: {page.url}")
