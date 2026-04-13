@@ -145,6 +145,42 @@ def _make_intercept_handler(photo_proof_json):
     return handle
 
 
+def _get_step_indicator(page):
+    step_el = page.query_selector('[data-current-step]')
+    if step_el:
+        return step_el.get_attribute('data-current-step')
+    active_step = page.query_selector('.education-step.active, .education-step--current')
+    if active_step:
+        return active_step.get_attribute('data-step') or active_step.inner_text().strip()
+    submit_btn = page.query_selector('#js-developer-pack-application-submit-button')
+    if submit_btn:
+        btn_text = submit_btn.inner_text().strip().lower()
+        if "continue" in btn_text:
+            return "step1"
+        elif "submit" in btn_text:
+            return "step2"
+    return None
+
+
+def _wait_for_step_change(page, previous_step, description, timeout=15000):
+    import time
+    deadline = time.time() + timeout / 1000
+    while time.time() < deadline:
+        error_el = page.query_selector('.flash-error, .flash-warn, .Banner--error')
+        if error_el:
+            page.screenshot(path="debug_step_error.png")
+            raise Exception(f"Step transition failed ({description}): {error_el.inner_text().strip()}")
+
+        current = _get_step_indicator(page)
+        if current and current != previous_step:
+            print(f"  Step advanced: '{previous_step}' -> '{current}' ({description})")
+            return current
+        page.wait_for_timeout(300)
+
+    page.screenshot(path="debug_step_timeout.png")
+    raise Exception(f"Step did not advance after '{description}' (timed out). Still on '{previous_step}'.")
+
+
 def apply_education(page, card_data, app_type="faculty"):
     school_name = card_data.get("schoolName", "")
     image_b64 = card_data.get("imageBase64", "")
@@ -167,6 +203,8 @@ def apply_education(page, card_data, app_type="faculty"):
     start_btn.click()
     print("Clicked 'Start an application'")
 
+    page.wait_for_timeout(1000)
+
     if app_type == "faculty":
         radio_id = "#dev_pack_form_application_type_faculty"
     else:
@@ -176,28 +214,77 @@ def apply_education(page, card_data, app_type="faculty"):
     radio.click()
     print(f"Selected application type: {app_type}")
 
-    school_input = page.wait_for_selector('#js-school-name-search', state="visible", timeout=10000)
-    school_input.fill("")
-    school_input.type(school_name, delay=80)
-    print(f"Typed school name: {school_name}")
-
-    school_list = page.wait_for_selector('#js-school-name-list [role="option"]', state="visible", timeout=10000)
-    school_list.click()
-    print("Selected school from dropdown")
-
     page.wait_for_timeout(500)
 
-    share_btn = page.wait_for_selector('button:has-text("Share Location")', state="visible", timeout=10000)
-    share_btn.click()
-    print("Clicked 'Share Location' — geolocation already granted via context")
+    school_input = page.wait_for_selector('#js-school-name-search', state="visible", timeout=10000)
+    school_input.fill("")
+    school_input.type(school_name, delay=100)
+    print(f"Typed school name: {school_name}")
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(1500)
+
+    page.wait_for_selector(
+        '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection',
+        state="visible",
+        timeout=15000,
+    )
+
+    all_options = page.query_selector_all(
+        '#js-school-name-list .ActionListItem.js-school-autocomplete-result-selection'
+    )
+    print(f"  Found {len(all_options)} school option(s) in dropdown")
+
+    best_match = None
+    school_name_lower = school_name.strip().lower()
+    for opt in all_options:
+        opt_name = opt.get_attribute('data-school-name') or opt.inner_text().strip()
+        print(f"    Option: '{opt_name}'")
+        if opt_name.strip().lower() == school_name_lower:
+            best_match = opt
+            break
+
+    if not best_match:
+        best_match = all_options[0]
+        fallback_name = best_match.get_attribute('data-school-name') or best_match.inner_text().strip()
+        print(f"  No exact match found, using first option: '{fallback_name}'")
+
+    selected_name = best_match.get_attribute('data-school-name') or best_match.inner_text().strip()
+    best_match.click()
+    print(f"Selected school from dropdown: '{selected_name}'")
+
+    page.wait_for_timeout(1000)
+
+    input_val = school_input.input_value()
+    print(f"  School input value after selection: '{input_val}'")
+    if not input_val.strip():
+        page.screenshot(path="debug_school_not_selected.png")
+        raise Exception("School selection failed — input is empty after clicking option")
+
+    share_btn = page.query_selector('button:has-text("Share Location")')
+    if share_btn and share_btn.is_visible():
+        share_btn.click()
+        print("Clicked 'Share Location' — geolocation already granted via context")
+        page.wait_for_timeout(2000)
+    else:
+        print("  'Share Location' button not found or not visible, skipping")
+
+    step_before = _get_step_indicator(page)
+    print(f"  Current step indicator before Continue: '{step_before}'")
 
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
+    btn_text_before = continue_btn.inner_text().strip()
+    print(f"  Button text: '{btn_text_before}'")
+
+    if continue_btn.is_disabled():
+        print("  WARNING: Continue button is disabled — something may be missing in step 1")
+        page.screenshot(path="debug_step1_disabled.png")
+        raise Exception("Continue button is disabled. Step 1 requirements not met.")
+
     continue_btn.click()
     print("Clicked 'Continue'")
 
-    page.wait_for_timeout(2000)
+    step_after = _wait_for_step_change(page, step_before, "Continue to step 2", timeout=15000)
+    print(f"  Confirmed step transition: now on '{step_after}'")
 
     if app_type == "student":
         proof_btn = page.wait_for_selector('button:has-text("Select...")', state="visible", timeout=10000)
@@ -211,15 +298,31 @@ def apply_education(page, card_data, app_type="faculty"):
         page.wait_for_timeout(500)
 
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
+    print(f"  Submit button text: '{submit_btn.inner_text().strip()}'")
+
+    if submit_btn.is_disabled():
+        print("  WARNING: Submit button is disabled — step 2 requirements not met")
+        page.screenshot(path="debug_step2_disabled.png")
+        raise Exception("Submit button is disabled. Step 2 requirements not met.")
+
     submit_btn.click()
     print("Clicked 'Submit Application'")
 
-    page.wait_for_timeout(3000)
+    page.wait_for_timeout(5000)
 
     banner = page.query_selector('.Banner-message')
     if banner:
         msg = banner.inner_text().strip()
         print(f"Education application result: {msg}")
     else:
-        print("Submit completed — checking page state...")
-        print(f"Current URL: {page.url}")
+        error_el = page.query_selector('.flash-error, .flash-warn, .Banner--error')
+        if error_el:
+            err_msg = error_el.inner_text().strip()
+            print(f"ERROR after submit: {err_msg}")
+            page.screenshot(path="debug_submit_error.png")
+            raise Exception(f"Submit failed: {err_msg}")
+        else:
+            print("Submit completed — checking page state...")
+            print(f"Current URL: {page.url}")
+            page.screenshot(path="debug_final_state.png")
+            print("Saved screenshot of final state to debug_final_state.png")

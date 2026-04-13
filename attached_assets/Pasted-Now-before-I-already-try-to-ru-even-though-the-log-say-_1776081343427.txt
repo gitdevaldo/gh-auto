@@ -1,0 +1,48 @@
+Now, before I already try to ru, even though the log say it's done.
+
+Last run:
+~/workspace$ python main.py --type faculty
+Got card data: name=OKTAVIA KUSUMA, school=SMKN 1 NGAWI
+Got username: gitalexisdev
+Split name: first='OKTAVIA', last='KUSUMA'
+Got address: 420 Loopview, Ban, Bali 11765
+Using existing browser profile: /home/runner/workspace/profiles/gitalexisdev
+Filled name field with: OKTAVIA KUSUMA
+After submit, landed on: https://github.com/settings/profile
+Profile updated successfully!
+Clicked Edit billing button, waiting for form...
+Billing form appeared
+Filled #billing_contact_first_name with: OKTAVIA
+Filled #billing_contact_last_name with: KUSUMA
+Filled #billing_contact_address1 with: 420 Loopview
+Filled #billing_contact_city with: Ban
+Selected country: Indonesia (ID)
+Filled #region_region with: Bali
+Filled #billing_contact_postal_code with: 11765
+Clicked Save billing information
+Billing updated successfully! Message: Successfully updated billing information.
+Route interceptor installed for developer_pack_applications
+Navigated to education benefits page
+Clicked 'Start an application'
+Selected application type: faculty
+Typed school name: SMKN 1 NGAWI
+Selected school from dropdown
+Clicked 'Share Location' — geolocation already granted via context
+Clicked 'Continue'
+Clicked 'Submit Application'
+Intercepted POST: replaced photo_proof with camera-faked blob
+Submit completed — checking page state...
+Current URL: https://github.com/settings/education/benefits
+All done!
+
+But, the actual isn't. The flow/step of applying the github edu is failed. Maybe, it's because the school, as the school is input and select, not just input.
+
+So, i need you to enhance this. make sure the SPA step is check, to make sure we really move to the step 2 or not.
+
+Also, for the school, please after you input, make sure to select the school by using element (this is example when I type SMKN 1 Ngawi):
+<anchored-position anchor="js-school-name-search" side="outside-bottom" allow-out-of-bounds="" id="js-school-name-list" popover="" data-view-component="true" class="ActionListWrap ActionListWrap--inset Overlay Overlay--height-auto Overlay--width-auto overflow-y-auto" aria-label="results" role="listbox" style="inset: 672.8px auto auto 274.8px;"><div data-selected-school-id="18635" data-school-name="SMKN 1 Ngawi" data-two-factor-required="false" data-override-distance-limit="false" data-camera-required="true" data-email-domains="[]" data-user-too-far-from-school="false" data-user-has-email-for-school="true" data-test-selector="autocomplete-item-school-18635" role="option" data-autocomplete-value="SMKN 1 Ngawi" data-view-component="true" class="ActionListItem js-school-autocomplete-result-selection" id="js-school-name-list-option-0">
+<span class="ActionListContent">
+
+  <span class="ActionListItem-label">SMKN 1 Ngawi</span>
+
+</span> </div></anchored-position>
