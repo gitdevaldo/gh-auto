@@ -8,7 +8,7 @@ load_dotenv()
 from lib.card import get_card_data
 from lib.cookies import load_cookies, get_username
 from lib.address import get_random_address, split_name
-from lib.browser import open_browser, open_browser_fresh, get_profile_dir
+from lib.browser import open_browser, get_profile_dir
 from lib.github import update_profile_name, update_billing_address, apply_education, ensure_2fa, login_github
 from lib.mailer import send_report
 
@@ -58,7 +58,7 @@ def main():
         profile_name = email
 
         header("Login")
-        context, ctx = open_browser_fresh(profile_name)
+        context, ctx = open_browser(profile_name)
         try:
             page = ctx.new_page()
 
@@ -87,7 +87,7 @@ def main():
         log(f"User: {username}")
 
         header("Setup")
-        context, ctx = open_browser(username, cookies)
+        context, ctx = open_browser(username, cookies=cookies)
         try:
             page = ctx.new_page()
 
