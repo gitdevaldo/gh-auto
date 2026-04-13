@@ -37,7 +37,7 @@ def get_card_data():
         resp = requests.get(CARD_API_URL)
         resp.raise_for_status()
         data = resp.json()
-    print(f"  Card: {data.get('name')} — {data.get('schoolName')}")
+    print(f"Card: {data.get('name')} — {data.get('schoolName')}")
     return data
 
 
