@@ -40,10 +40,16 @@ def main():
 
     header("Preparing")
 
-    card_data = get_card_data()
+    card_data = get_card_data(app_type=args.type)
     name = card_data["name"]
     first_name, last_name = split_name(name)
     log(f"Name: {first_name} {last_name}")
+
+    geo = {
+        "latitude": card_data.get("schoolLatitude", 0),
+        "longitude": card_data.get("schoolLongitude", 0),
+    }
+    log(f"Location: {geo['latitude']}, {geo['longitude']}")
 
     address = get_random_address()
     log(f"Address: {address.get('address_line')}, {address.get('city')}")
@@ -58,8 +64,7 @@ def main():
         profile_name = email
 
         header("Login")
-        institution = card_data.get("institution", "")
-        context, ctx = open_browser(profile_name, institution=institution)
+        context, ctx = open_browser(profile_name, geolocation=geo)
         try:
             page = ctx.new_page()
 
@@ -88,8 +93,7 @@ def main():
         log(f"User: {username}")
 
         header("Setup")
-        institution = card_data.get("institution", "")
-        context, ctx = open_browser(username, cookies=cookies, institution=institution)
+        context, ctx = open_browser(username, cookies=cookies, geolocation=geo)
         try:
             page = ctx.new_page()
 

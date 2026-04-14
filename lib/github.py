@@ -388,15 +388,20 @@ def _build_photo_proof(image_b64):
     })
 
 
-def _make_intercept_handler(photo_proof_json):
+def _make_intercept_handler(photo_proof_json, latitude, longitude):
     def handle(route):
         request = route.request
         body = request.post_data or ""
         params = parse_qs(body, keep_blank_values=True)
 
-        key = "dev_pack_form[photo_proof]"
-        if key in params:
-            params[key] = [photo_proof_json]
+        if "dev_pack_form[photo_proof]" in params:
+            params["dev_pack_form[photo_proof]"] = [photo_proof_json]
+
+        if "dev_pack_form[latitude]" in params:
+            params["dev_pack_form[latitude]"] = [str(latitude)]
+
+        if "dev_pack_form[longitude]" in params:
+            params["dev_pack_form[longitude]"] = [str(longitude)]
 
         new_body = urlencode(params, doseq=True)
         route.continue_(post_data=new_body)
@@ -407,6 +412,8 @@ def _make_intercept_handler(photo_proof_json):
 def apply_education(page, card_data, app_type="faculty"):
     school_name = card_data.get("schoolName", "")
     image_b64 = card_data.get("imageBase64", "")
+    latitude = card_data.get("schoolLatitude", 0)
+    longitude = card_data.get("schoolLongitude", 0)
 
     if not school_name:
         _err("Education application failed — card data missing 'schoolName'")
@@ -415,7 +422,7 @@ def apply_education(page, card_data, app_type="faculty"):
 
     photo_proof_json = _build_photo_proof(image_b64)
 
-    page.route("**/settings/education/developer_pack_applications", _make_intercept_handler(photo_proof_json))
+    page.route("**/settings/education/developer_pack_applications", _make_intercept_handler(photo_proof_json, latitude, longitude))
 
     _goto(page, EDUCATION_URL)
 
