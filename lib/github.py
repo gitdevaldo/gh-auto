@@ -62,6 +62,11 @@ def login_github(page, email, password):
     page.evaluate('document.querySelector(\'input[name="commit"][value="Sign in"]\').click()')
     page.wait_for_timeout(5000)
 
+    error_el = page.locator('.js-flash-alert')
+    if error_el.count() > 0 and error_el.first.is_visible():
+        error_text = error_el.first.inner_text().strip()
+        _err(f"Login failed — {error_text}")
+
     current_url = page.url
     if "sessions/two-factor" in current_url:
         _handle_login_2fa(page, email)
@@ -69,11 +74,7 @@ def login_github(page, email, password):
         _log(f"Logged in as: {username}")
         return username
 
-    if "github.com/login" in current_url:
-        error_el = page.locator('.js-flash-alert, .flash-error, #js-flash-container .flash-error')
-        if error_el.count() > 0:
-            error_text = error_el.first.inner_text().strip()
-            _err(f"Login failed — {error_text}")
+    if "github.com/login" in current_url or "github.com/session" in current_url:
         _err("Login failed — incorrect email/username or password")
 
     username = _get_username_from_page(page)
