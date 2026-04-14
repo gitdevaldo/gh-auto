@@ -2,6 +2,8 @@ import base64
 import json
 import os
 import re
+import signal
+import sys
 from urllib.parse import parse_qs, urlencode
 
 import pyotp
@@ -25,8 +27,11 @@ def _log(msg):
     print(msg)
 
 
-def _err(msg):
+def _err(msg, page=None):
+    url = page.url if page else None
     print(f"[ERROR] {msg}")
+    if url:
+        print(f"Page = {url}")
     raise Exception(msg)
 
 
@@ -62,20 +67,26 @@ def login_github(page, email, password):
     page.evaluate('document.querySelector(\'input[name="commit"][value="Sign in"]\').click()')
     page.wait_for_timeout(5000)
 
-    error_el = page.locator('.js-flash-alert')
-    if error_el.count() > 0 and error_el.first.is_visible():
-        error_text = error_el.first.inner_text().strip()
-        _err(f"Login failed — {error_text}")
-
     current_url = page.url
+
+    if "github.com/login" in current_url:
+        error_el = page.locator('.js-flash-alert')
+        if error_el.count() > 0 and error_el.first.is_visible():
+            error_text = error_el.first.inner_text().strip()
+            _err(f"Login failed — {error_text}", page)
+        _err("Login failed — incorrect email/username or password", page)
+
     if "sessions/two-factor" in current_url:
         _handle_login_2fa(page, email)
         username = _get_username_from_page(page)
         _log(f"Logged in as: {username}")
         return username
 
-    if "github.com/login" in current_url or "github.com/session" in current_url:
-        _err("Login failed — incorrect email/username or password")
+    if "session/verify" in current_url:
+        _handle_device_verification(page)
+        username = _get_username_from_page(page)
+        _log(f"Logged in as: {username}")
+        return username
 
     username = _get_username_from_page(page)
     _log(f"Logged in as: {username}")
@@ -138,7 +149,63 @@ def _handle_login_2fa(page, login_identifier):
 
     current_url = page.url
     if "sessions/two-factor" in current_url:
-        _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.")
+        _err("2FA verification failed — OTP code was rejected. Check if the saved secret is still valid.", page)
+
+
+def _handle_device_verification(page):
+    _log("Device verification required — GitHub is asking for email OTP")
+    otp_input = page.locator('input#otp')
+    if otp_input.count() == 0:
+        otp_input = page.locator('input[name="otp"]')
+    if otp_input.count() == 0:
+        otp_input = page.locator('input[type="text"]').first
+
+    try:
+        if sys.platform != "win32":
+            def _timeout_handler(signum, frame):
+                raise TimeoutError()
+            old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+            signal.alarm(120)
+            try:
+                code = input("Enter the OTP code sent to your email (120s timeout): ").strip()
+            finally:
+                signal.alarm(0)
+                signal.signal(signal.SIGALRM, old_handler)
+        else:
+            import threading
+            result = [None]
+            def _read_input():
+                try:
+                    result[0] = input("Enter the OTP code sent to your email (120s timeout): ").strip()
+                except EOFError:
+                    result[0] = None
+            t = threading.Thread(target=_read_input, daemon=True)
+            t.start()
+            t.join(timeout=120)
+            if t.is_alive() or result[0] is None:
+                _err("Device verification failed — OTP input timed out after 120s", page)
+            code = result[0]
+    except (EOFError, TimeoutError):
+        _err("Device verification failed — OTP input timed out after 120s", page)
+
+    if not code:
+        _err("Device verification failed — empty OTP code", page)
+
+    otp_input.wait_for(state="visible", timeout=10000)
+    otp_input.fill("")
+    otp_input.type(code, delay=100)
+    page.wait_for_timeout(DELAY)
+
+    submit_btn = page.locator('button[type="submit"]')
+    if submit_btn.count() > 0 and submit_btn.first.is_visible():
+        submit_btn.first.click()
+        page.wait_for_timeout(5000)
+        page.wait_for_load_state("domcontentloaded")
+        page.wait_for_timeout(DELAY)
+
+    current_url = page.url
+    if "session/verify" in current_url:
+        _err("Device verification failed — OTP code was rejected", page)
 
 
 def _get_username_from_page(page):
@@ -172,7 +239,7 @@ def _get_username_from_page(page):
                 username = meta.get_attribute("content")
 
     if not username:
-        _err("Could not determine username — no 'dotcom_user' cookie or user meta tag found")
+        _err("Could not determine username — no 'dotcom_user' cookie or user meta tag found", page)
 
     return username
 
@@ -294,7 +361,7 @@ def update_profile_name(page, name):
 
     name_input = page.query_selector('input[name="user[profile_name]"]')
     if not name_input:
-        _err("Profile update failed — name input field not found on the page")
+        _err("Profile update failed — name input field not found on the page", page)
 
     name_input.fill("")
     page.wait_for_timeout(DELAY)
@@ -305,7 +372,7 @@ def update_profile_name(page, name):
     if not submit_btn:
         submit_btn = page.query_selector('button[type="submit"]')
     if not submit_btn:
-        _err("Profile update failed — submit button not found on the page")
+        _err("Profile update failed — submit button not found on the page", page)
 
     submit_btn.click()
 
@@ -357,7 +424,7 @@ def update_billing_address(page, first_name, last_name, address):
     if not save_btn:
         save_btn = page.query_selector('button[type="submit"].Button--primary')
     if not save_btn:
-        _err("Billing update failed — save button not found on the page")
+        _err("Billing update failed — save button not found on the page", page)
 
     save_btn.click()
 
@@ -417,9 +484,9 @@ def apply_education(page, card_data, app_type="faculty"):
     longitude = card_data.get("schoolLongitude", 0)
 
     if not school_name:
-        _err("Education application failed — card data missing 'schoolName'")
+        _err("Education application failed — card data missing 'schoolName'", page)
     if not image_b64:
-        _err("Education application failed — card data missing 'imageBase64'")
+        _err("Education application failed — card data missing 'imageBase64'", page)
 
     photo_proof_json = _build_photo_proof(image_b64)
 
@@ -430,13 +497,13 @@ def apply_education(page, card_data, app_type="faculty"):
     start_btn = page.query_selector('#dialog-show-education-benefits-dialog')
     if not start_btn or not start_btn.is_visible():
         if "/pricing" in page.url:
-            _err("Account is flagged by GitHub — redirected to /pricing")
-        _err("Account is flagged by GitHub — education application button not available")
+            _err("Account is flagged by GitHub — redirected to /pricing", page)
+        _err("Account is flagged by GitHub — education application button not available", page)
     page.wait_for_timeout(DELAY)
     start_btn.click()
     page.wait_for_timeout(DELAY)
     if "/pricing" in page.url:
-        _err("Account is flagged by GitHub — redirected to /pricing")
+        _err("Account is flagged by GitHub — redirected to /pricing", page)
 
     page.wait_for_timeout(DELAY)
 
@@ -487,7 +554,7 @@ def apply_education(page, card_data, app_type="faculty"):
 
     input_val = school_input.input_value()
     if not input_val.strip():
-        _err("Education application failed — school selection didn't register, input is empty")
+        _err("Education application failed — school selection didn't register, input is empty", page)
 
     share_btn = page.query_selector('button:has-text("Share Location")')
     if share_btn and share_btn.is_visible():
@@ -500,7 +567,7 @@ def apply_education(page, card_data, app_type="faculty"):
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
 
     if continue_btn.is_disabled():
-        _err("Education application failed — continue button is disabled, step 1 requirements not met")
+        _err("Education application failed — continue button is disabled, step 1 requirements not met", page)
 
     page.wait_for_timeout(DELAY)
     continue_btn.click()
@@ -523,7 +590,7 @@ def apply_education(page, card_data, app_type="faculty"):
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
     if submit_btn.is_disabled():
-        _err("Education application failed — submit button is disabled, step 2 requirements not met")
+        _err("Education application failed — submit button is disabled, step 2 requirements not met", page)
 
     page.wait_for_timeout(DELAY)
     submit_btn.click()
@@ -549,7 +616,7 @@ def apply_education(page, card_data, app_type="faculty"):
         final_submit = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
         if final_submit.is_disabled():
-            _err("Education application failed — submit button is disabled, step 3 requirements not met")
+            _err("Education application failed — submit button is disabled, step 3 requirements not met", page)
 
         page.wait_for_timeout(DELAY)
         final_submit.click()
