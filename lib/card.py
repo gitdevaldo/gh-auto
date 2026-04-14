@@ -31,12 +31,15 @@ MOCK_CARD_DATA = {
 }
 
 
-def get_card_data(app_type="faculty"):
+def get_card_data(app_type="faculty", institution=None):
     if MOCKUP:
         data = MOCK_CARD_DATA
     else:
         api_type = "teacher" if app_type == "faculty" else "student"
-        resp = requests.get(f"{CARD_API_URL}?type={api_type}")
+        url = f"{CARD_API_URL}?type={api_type}"
+        if institution:
+            url += f"&institution={institution}"
+        resp = requests.get(url)
         resp.raise_for_status()
         data = resp.json()
     print(f"Card: {data.get('name')} — {data.get('schoolName')}")

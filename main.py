@@ -36,11 +36,13 @@ def main():
                         help="Login with email/username and password: email/username password")
     parser.add_argument("--report", type=str, default=None,
                         help="Send success report to this email address")
+    parser.add_argument("--institution", type=str, default=None,
+                        help="Institution code for card API (e.g. ubsi, iainkediri, smkn1ngawi)")
     args, remaining = parser.parse_known_args()
 
     header("Preparing")
 
-    card_data = get_card_data(app_type=args.type)
+    card_data = get_card_data(app_type=args.type, institution=args.institution)
     name = card_data["name"]
     first_name, last_name = split_name(name)
     log(f"Name: {first_name} {last_name}")
