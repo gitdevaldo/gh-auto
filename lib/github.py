@@ -82,7 +82,7 @@ def login_github(page, email, password):
         _log(f"Logged in as: {username}")
         return username
 
-    if "session/verify" in current_url:
+    if "sessions/verified-device" in current_url or "session/verify" in current_url:
         _handle_device_verification(page)
         username = _get_username_from_page(page)
         _log(f"Logged in as: {username}")
@@ -204,7 +204,7 @@ def _handle_device_verification(page):
         page.wait_for_timeout(DELAY)
 
     current_url = page.url
-    if "session/verify" in current_url:
+    if "sessions/verified-device" in current_url or "session/verify" in current_url:
         _err("Device verification failed — OTP code was rejected", page)
 
 
