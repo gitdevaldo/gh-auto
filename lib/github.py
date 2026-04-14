@@ -427,9 +427,16 @@ def apply_education(page, card_data, app_type="faculty"):
 
     _goto(page, EDUCATION_URL)
 
-    start_btn = page.wait_for_selector('#dialog-show-education-benefits-dialog', state="visible", timeout=15000)
+    start_btn = page.query_selector('#dialog-show-education-benefits-dialog')
+    if not start_btn or not start_btn.is_visible():
+        if "/pricing" in page.url:
+            _err("Account is flagged by GitHub — redirected to /pricing")
+        _err("Account is flagged by GitHub — education application button not available")
     page.wait_for_timeout(DELAY)
     start_btn.click()
+    page.wait_for_timeout(DELAY)
+    if "/pricing" in page.url:
+        _err("Account is flagged by GitHub — redirected to /pricing")
 
     page.wait_for_timeout(DELAY)
 
