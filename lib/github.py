@@ -19,6 +19,7 @@ TWO_FA_SETUP_URL = "https://github.com/settings/two_factor_authentication/setup/
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OTP_DIR = os.path.join(BASE_DIR, "otp")
+OTP_ALIASES_PATH = os.path.join(OTP_DIR, "aliases.json")
 
 DELAY = 2000
 
@@ -40,17 +41,66 @@ def _goto(page, url):
     page.wait_for_timeout(3000)
 
 
+def _load_otp_aliases():
+    if not os.path.exists(OTP_ALIASES_PATH):
+        return {}
+
+    try:
+        with open(OTP_ALIASES_PATH, "r") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    if not isinstance(data, dict):
+        return {}
+
+    aliases = {}
+    for key, value in data.items():
+        if isinstance(key, str) and isinstance(value, str) and key.strip() and value.strip():
+            aliases[key.strip().lower()] = value.strip()
+    return aliases
+
+
+def _save_otp_alias(login_identifier, username):
+    login_key = (login_identifier or "").strip().lower()
+    username_value = (username or "").strip()
+    if not login_key or not username_value:
+        return
+
+    aliases = _load_otp_aliases()
+    aliases[login_key] = username_value
+    aliases[username_value.lower()] = username_value
+
+    os.makedirs(OTP_DIR, exist_ok=True)
+    with open(OTP_ALIASES_PATH, "w") as f:
+        json.dump(aliases, f, indent=2, sort_keys=True)
+
+
+def _remember_login_alias(login_identifier, username):
+    try:
+        _save_otp_alias(login_identifier, username)
+    except OSError:
+        _log("Warning: failed to save OTP alias mapping; continuing without alias update")
+
+
 def login_github(page, email, password):
+    otp_identifier = email
+
     _goto(page, LOGIN_URL)
 
     current_url = page.url
     if "github.com/login" not in current_url and "sessions/two-factor" not in current_url:
         _log("Already logged in — login skipped")
-        return _get_username_from_page(page)
+        username = _get_username_from_page(page)
+        _remember_login_alias(email, username)
+        _remember_login_alias(otp_identifier, username)
+        return username
 
     if "sessions/two-factor" in current_url:
-        _handle_login_2fa(page, email)
+        _handle_login_2fa(page, otp_identifier)
         username = _get_username_from_page(page)
+        _remember_login_alias(email, username)
+        _remember_login_alias(otp_identifier, username)
         _log(f"Logged in as: {username}")
         return username
 
@@ -77,18 +127,24 @@ def login_github(page, email, password):
         _err("Login failed — incorrect email/username or password", page)
 
     if "sessions/two-factor" in current_url:
-        _handle_login_2fa(page, email)
+        _handle_login_2fa(page, otp_identifier)
         username = _get_username_from_page(page)
+        _remember_login_alias(email, username)
+        _remember_login_alias(otp_identifier, username)
         _log(f"Logged in as: {username}")
         return username
 
     if "sessions/verified-device" in current_url or "session/verify" in current_url:
         _handle_device_verification(page)
         username = _get_username_from_page(page)
+        _remember_login_alias(email, username)
+        _remember_login_alias(otp_identifier, username)
         _log(f"Logged in as: {username}")
         return username
 
     username = _get_username_from_page(page)
+    _remember_login_alias(email, username)
+    _remember_login_alias(otp_identifier, username)
     _log(f"Logged in as: {username}")
     return username
 
@@ -112,6 +168,14 @@ def _find_otp_secret(login_identifier):
         with open(exact_path, "r") as f:
             return f.read().strip()
 
+    aliases = _load_otp_aliases()
+    mapped_username = aliases.get(login_identifier.lower())
+    if mapped_username:
+        mapped_path = os.path.join(OTP_DIR, mapped_username, "secret.txt")
+        if os.path.exists(mapped_path):
+            with open(mapped_path, "r") as f:
+                return f.read().strip()
+
     available = [d for d in os.listdir(OTP_DIR) if os.path.isdir(os.path.join(OTP_DIR, d))]
     _err(
         f"No OTP secret found for '{login_identifier}'. "
@@ -120,8 +184,30 @@ def _find_otp_secret(login_identifier):
     )
 
 
+def _username_hint_from_page(page):
+    cookies = page.context.cookies()
+    for cookie in cookies:
+        if cookie.get("name") == "dotcom_user" and cookie.get("value"):
+            return cookie["value"].strip()
+
+    meta = page.locator('meta[name="user-login"]')
+    if meta.count() > 0:
+        content = (meta.get_attribute("content") or "").strip()
+        if content:
+            return content
+    return None
+
+
 def _handle_login_2fa(page, login_identifier):
-    secret = _find_otp_secret(login_identifier)
+    try:
+        secret = _find_otp_secret(login_identifier)
+    except Exception:
+        hinted_username = _username_hint_from_page(page)
+        if hinted_username and hinted_username.lower() != login_identifier.lower():
+            secret = _find_otp_secret(hinted_username)
+            _remember_login_alias(login_identifier, hinted_username)
+        else:
+            raise
 
     totp = pyotp.TOTP(secret)
     otp_code = totp.now()
@@ -356,6 +442,40 @@ def _scrape_recovery_codes(page):
     return ""
 
 
+def _banner_titles(page):
+    titles = []
+    seen = set()
+    for item in page.query_selector_all(".Banner-title"):
+        raw = item.inner_text().strip()
+        if not raw:
+            continue
+        text = " ".join(raw.split())
+        key = text.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        titles.append(text)
+    return titles
+
+
+def _discount_error_message(page):
+    for text in _banner_titles(page):
+        lower = text.lower()
+        if (
+            "error creating the discount request" in lower
+            or "discount request could not be created" in lower
+            or "has already been used to obtain an academic discount" in lower
+        ):
+            return text
+    return None
+
+
+def _raise_if_discount_error(page):
+    discount_error = _discount_error_message(page)
+    if discount_error:
+        _err(f"Education application rejected — {discount_error}", page)
+
+
 def update_profile_name(page, name):
     _goto(page, PROFILE_URL)
 
@@ -567,12 +687,14 @@ def apply_education(page, card_data, app_type="faculty"):
     continue_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=10000)
 
     if continue_btn.is_disabled():
+        _raise_if_discount_error(page)
         _err("Education application failed — continue button is disabled, step 1 requirements not met", page)
 
     page.wait_for_timeout(DELAY)
     continue_btn.click()
 
     page.wait_for_timeout(5000)
+    _raise_if_discount_error(page)
 
     if app_type == "student":
         select_btn = page.locator('button.Button--secondary:has-text("Select...")')
@@ -590,12 +712,14 @@ def apply_education(page, card_data, app_type="faculty"):
     submit_btn = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
     if submit_btn.is_disabled():
+        _raise_if_discount_error(page)
         _err("Education application failed — submit button is disabled, step 2 requirements not met", page)
 
     page.wait_for_timeout(DELAY)
     submit_btn.click()
 
     page.wait_for_timeout(5000)
+    _raise_if_discount_error(page)
 
     location_mismatch = page.query_selector('#dev_pack_form_far_from_campus_reason_distant_course_work')
     if location_mismatch and location_mismatch.is_visible():
@@ -616,15 +740,19 @@ def apply_education(page, card_data, app_type="faculty"):
         final_submit = page.wait_for_selector('#js-developer-pack-application-submit-button', state="visible", timeout=15000)
 
         if final_submit.is_disabled():
+            _raise_if_discount_error(page)
             _err("Education application failed — submit button is disabled, step 3 requirements not met", page)
 
         page.wait_for_timeout(DELAY)
         final_submit.click()
 
         page.wait_for_timeout(5000)
+        _raise_if_discount_error(page)
 
-    banner = page.query_selector('.Banner-message .Banner-title')
-    if banner and "Your application has been submitted" in banner.inner_text().strip():
+    banners = _banner_titles(page)
+    if any("your application has been submitted" in text.lower() for text in banners):
         _log("Application submitted")
     else:
-        _log(f"Application status unclear — {page.url}")
+        _raise_if_discount_error(page)
+        latest_banner = banners[0] if banners else "no banner message found"
+        _err(f"Education application status unclear — {latest_banner}", page)
